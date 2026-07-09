@@ -39,6 +39,225 @@
   font-size: 20px;
 }
 
+.typewriterCursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  background: #0f766e;
+  vertical-align: -0.15em;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.carousel {
+  position: relative;
+  margin-top: 28px;
+  border: 1px solid #d8dee5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.carouselTrack {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+  min-height: 220px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.slideStat {
+  background: #f4fbfa;
+}
+
+.slideAction {
+  background: #ffffff;
+}
+
+.slideSpotlight {
+  background: #fdf6f0;
+}
+
+.slideEyebrow {
+  margin: 0;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.slideStatValue {
+  margin: 0;
+  color: #101828;
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.slideStatLabel {
+  margin: 0;
+  max-width: 520px;
+  color: #344054;
+  font-size: 18px;
+}
+
+.slideSource {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.slideActionText,
+.slideSpotlightText {
+  margin: 0;
+  max-width: 560px;
+  color: #101828;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.slideButton {
+  align-self: flex-start;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.slideButton:hover {
+  background: #0b5c56;
+}
+
+.slideButtonOutline {
+  background: transparent;
+  border: 2px solid #0f766e;
+  color: #0f766e;
+}
+
+.slideButtonOutline:hover {
+  background: #d9f4f0;
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px;
+  border-top: 1px solid #eef1f4;
+}
+
+.carouselArrow {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: #667085;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.carouselArrow:hover {
+  background: #f2f4f7;
+  color: #101828;
+}
+
+.carouselDots {
+  display: flex;
+  gap: 8px;
+}
+
+.carouselDot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #d0d5dd;
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.carouselDotActive {
+  width: 20px;
+  background: #0f766e;
+}
+
+.carouselPause {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: #667085;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.carouselPause:hover {
+  background: #f2f4f7;
+  color: #101828;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 36px;
+}
+
+.statCard {
+  padding: 24px 20px;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.statValue {
+  margin: 0 0 8px;
+  color: #0f766e;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statLabel {
+  margin: 0 0 12px;
+  color: #101828;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.statSource {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .features {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
