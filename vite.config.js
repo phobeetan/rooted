@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
+import { womenLedStocks } from './src/womenLedStocks.js'
+
+const page = (path) => fileURLToPath(new URL(path, import.meta.url))
 
 const systemPrompt = `You are Rooted's AI Investment Assistant. You help users understand investing in simple, beginner-friendly language. Focus on financial education, long-term thinking, risk awareness, diversification, and confidence-building.
 
@@ -17,6 +21,9 @@ const mockPortfolioContext = {
     { ticker: 'QQQ', allocationPercent: 12.1 },
   ],
 }
+
+let stockCache = null
+let coinbaseCache = null
 
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -39,6 +46,89 @@ function sendJson(res, status, body) {
   res.statusCode = status
   res.setHeader('Content-Type', 'application/json')
   res.end(JSON.stringify(body))
+}
+
+function num(value) {
+  return Number(String(value || '').replace(/[$,%+,]/g, '')) || 0
+}
+
+function fallbackQuote(stock) {
+  const seed = stock.symbol.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  const day = Math.floor(Date.now() / 86400000)
+  const changePercent = Number((Math.sin((day + seed) / 5) * 2.8).toFixed(2))
+  const price = Number((35 + (seed % 360) + changePercent).toFixed(2))
+  const change = Number(((price * changePercent) / 100).toFixed(2))
+
+  return {
+    ...stock,
+    price,
+    change,
+    changePercent,
+    asOf: new Date().toISOString(),
+    source: 'demo',
+  }
+}
+
+async function nasdaqQuote(stock) {
+  const response = await fetch(`https://api.nasdaq.com/api/quote/${stock.symbol}/info?assetclass=stocks`, {
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'User-Agent': 'Mozilla/5.0',
+    },
+  })
+  const data = await response.json()
+  if (!response.ok || !data.data?.primaryData) throw new Error('Quote unavailable.')
+
+  const primary = data.data.primaryData
+  const price = num(primary.lastSalePrice)
+  if (!price) throw new Error('Quote unavailable.')
+
+  return {
+    ...stock,
+    price,
+    change: num(primary.netChange),
+    changePercent: num(primary.percentageChange),
+    asOf: primary.lastTradeTimestamp || new Date().toISOString(),
+    source: 'nasdaq',
+  }
+}
+
+async function coinbaseStatus() {
+  if (coinbaseCache && Date.now() - coinbaseCache.time < 120000) return coinbaseCache.value
+
+  try {
+    const response = await fetch('https://api.coinbase.com/api/v3/brokerage/market/products?limit=1')
+    const data = await response.json()
+    coinbaseCache = {
+      time: Date.now(),
+      value: {
+        ok: response.ok,
+        product: data.products?.[0]?.product_id || null,
+        note: 'Coinbase public market API is connected for crypto products; stock quotes use the equities feed.',
+      },
+    }
+  } catch (error) {
+    coinbaseCache = {
+      time: Date.now(),
+      value: { ok: false, product: null, note: error.message || 'Coinbase check failed.' },
+    }
+  }
+
+  return coinbaseCache.value
+}
+
+async function stockData() {
+  if (stockCache && Date.now() - stockCache.time < 60000) return stockCache.value
+
+  const quotes = await Promise.all(
+    womenLedStocks.map((stock) => nasdaqQuote(stock).catch(() => fallbackQuote(stock))),
+  )
+  const value = {
+    stocks: quotes,
+    coinbase: await coinbaseStatus(),
+  }
+  stockCache = { time: Date.now(), value }
+  return value
 }
 
 function cleanMessages(messages) {
@@ -133,6 +223,16 @@ function investmentChatApi(req, res, next) {
     .catch((error) => sendJson(res, 500, { error: error.message || 'Chat failed.' }))
 }
 
+function stocksApi(req, res, next) {
+  const url = new URL(req.url, 'http://localhost')
+  if (url.pathname !== '/api/stocks') return next()
+  if (req.method !== 'GET') return sendJson(res, 405, { error: 'Use GET.' })
+
+  stockData()
+    .then((data) => sendJson(res, 200, data))
+    .catch((error) => sendJson(res, 500, { error: error.message || 'Stock data failed.' }))
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -140,11 +240,24 @@ export default defineConfig({
     {
       name: 'investment-chat-api',
       configureServer(server) {
+        server.middlewares.use(stocksApi)
         server.middlewares.use(investmentChatApi)
       },
       configurePreviewServer(server) {
+        server.middlewares.use(stocksApi)
         server.middlewares.use(investmentChatApi)
       },
     },
   ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: page('./index.html'),
+        login: page('./login.html'),
+        onboarding: page('./onboarding.html'),
+        dashboard: page('./dashboard.html'),
+      },
+      external: (id) => id.startsWith('https://'),
+    },
+  },
 })

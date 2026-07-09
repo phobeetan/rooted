@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding - Rooted</title>
+  <link rel="stylesheet" href="styles/global.css">
+  <link rel="stylesheet" href="styles/onboarding.css">
+  <style>
+    /* Inline critical styles */
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+    .step-section { display: none; }
+    .step-section[data-step="1"] { display: block; }
+    button { cursor: pointer; padding: 10px 20px; border-radius: 4px; border: 1px solid #ccc; }
+    button:hover { background-color: #f0f0f0; }
+    button.selected { background-color: #007bff; color: white; border-color: #007bff; }
+    .error { color: #dc3545; font-size: 0.875rem; margin-top: 4px; display: none; }
+    input, textarea { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    input:focus, textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .button-group { display: flex; gap: 10px; }
+    .button-group button { flex: 1; }
+    .navigation { display: flex; gap: 10px; margin-top: 30px; }
+    .navigation button { flex: 1; }
+    #done-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #loading { display: none; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to Rooted</h1>
+      <p id="step-indicator" class="step-indicator">Step 1 of 2</p>
+    </div>
+    <div id="error-summary" class="error" style="display:none; margin-bottom:16px;"></div>
+
+    <!-- Step 1: Account & Profile Basics -->
+    <div id="step-1" class="step-section" data-step="1">
+      <h2>Create Your Account</h2>
+
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" placeholder="Jane Doe" required>
+        <div id="error-name" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="birthday">Birthday *</label>
+        <input type="date" id="birthday" required>
+        <div id="error-birthday" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input type="email" id="email" placeholder="jane@example.com" required>
+        <div id="error-email" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Create Password *</label>
+        <input type="password" id="password" placeholder="At least 8 characters" required>
+        <div id="error-password" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password *</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+        <div id="error-confirmPassword" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="occupation">Occupation</label>
+        <input type="text" id="occupation" placeholder="e.g., Software Engineer">
+      </div>
+
+      <div class="form-group">
+        <label for="salary">Annual Salary *</label>
+        <input type="number" id="salary" placeholder="0" min="0" required>
+        <div id="error-salary" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="monthlySpending">Average Monthly Spending *</label>
+        <input type="number" id="monthlySpending" placeholder="0" min="0" required>
+        <div id="error-monthlySpending" class="error"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Targeted Questions -->
+    <div id="step-2" class="step-section" data-step="2" aria-hidden="true">
+      <h2>Tell Us About Your Goals</h2>
+
+      <div class="form-group">
+        <label>What are your goals? *</label>
+        <div class="button-group">
+          <button type="button" data-goal="Short-term" class="goal-btn">Short-term</button>
+          <button type="button" data-goal="Long-term" class="goal-btn">Long-term</button>
+        </div>
+        <div id="error-goals" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <label>What's your current financial knowledge? *</label>
+        <div class="button-group">
+          <button type="button" data-knowledge="No background" class="knowledge-btn">No background</button>
+          <button type="button" data-knowledge="Some knowledge" class="knowledge-btn">Some knowledge</button>
+          <button type="button" data-knowledge="Moderately knowledgeable" class="knowledge-btn">Moderately knowledgeable</button>
+          <button type="button" data-knowledge="Proficient" class="knowledge-btn">Proficient</button>
+        </div>
+        <div id="error-knowledge" class="error"></div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading">Creating your account...</div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation">
+      <button id="back-btn" style="display: none;">Back</button>
+      <button id="next-btn">Next</button>
+      <button id="done-btn" style="display: none;" disabled>Done</button>
+    </div>
+  </div>
+
+  <script type="module" src="./scripts/viewcontrollers/onboardingController.js"></script>
+</body>
+</html>

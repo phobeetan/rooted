@@ -598,6 +598,7 @@ nav a:hover {
 }
 
 .btn-outline {
+  display: inline-block;
   padding: 0.85rem 1.8rem;
   color: var(--brown-deep);
   background: none;
@@ -606,6 +607,7 @@ nav a:hover {
   font: inherit;
   font-size: 0.78rem;
   letter-spacing: 0.1em;
+  text-decoration: none;
   text-transform: uppercase;
   transition: color 0.2s, background 0.2s;
   white-space: nowrap;
@@ -801,6 +803,282 @@ footer {
   font-size: 0.75rem;
 }
 
+.paper-page {
+  min-height: calc(100vh - 73px);
+  padding: 4rem 6vw 6rem;
+}
+
+.paper-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.paper-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.paper-head h1 {
+  max-width: 17ch;
+  margin: 0.45rem 0 0;
+  font-size: clamp(2.1rem, 4.8vw, 4rem);
+  line-height: 1.04;
+}
+
+.paper-head p {
+  max-width: 48ch;
+  margin-top: 1rem;
+  color: var(--brown);
+  line-height: 1.65;
+}
+
+.source-note {
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  color: var(--brown);
+  background: rgba(237, 241, 232, 0.72);
+  border: 1px solid var(--line);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.paper-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.paper-metrics div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: var(--cream);
+}
+
+.paper-metrics span,
+.holding-list small,
+.order-list small {
+  color: rgba(85, 64, 47, 0.62);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.paper-metrics strong {
+  color: var(--brown-deep);
+  font-size: 1.25rem;
+}
+
+.trade-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(280px, 1.1fr);
+  gap: 1px;
+  margin-bottom: 2rem;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.trade-panel,
+.portfolio-panel,
+.market-section,
+.orders-section {
+  padding: 1.4rem;
+  background: var(--cream);
+}
+
+.trade-panel .tag {
+  color: var(--rose);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.trade-panel h2,
+.portfolio-panel h2,
+.market-section h2,
+.orders-section h2 {
+  margin: 0.55rem 0 0;
+  font-size: 1.35rem;
+}
+
+.trade-panel h2 span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--brown);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 400;
+}
+
+.trade-panel p {
+  margin: 0.9rem 0 0;
+  color: var(--brown);
+  font-size: 0.9rem;
+}
+
+.price-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin: 1.3rem 0;
+}
+
+.price-line strong {
+  color: var(--brown-deep);
+  font-size: 2rem;
+}
+
+.up {
+  color: var(--sage);
+}
+
+.down,
+.trade-error {
+  color: var(--rose);
+}
+
+.trade-field {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--brown);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trade-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.85rem 0.9rem;
+  color: var(--ink);
+  background: rgba(237, 241, 232, 0.58);
+  border: 1px solid var(--line);
+  outline: none;
+}
+
+.trade-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.trade-actions button {
+  padding: 0.9rem;
+  color: var(--cream);
+  background: var(--brown-deep);
+  border: 1px solid var(--brown-deep);
+  cursor: pointer;
+}
+
+.trade-actions button + button {
+  color: var(--brown-deep);
+  background: none;
+}
+
+.trade-error {
+  margin: 0.8rem 0 0;
+  font-size: 0.84rem;
+}
+
+.holding-list,
+.order-list {
+  display: grid;
+  gap: 1px;
+  margin-top: 1rem;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.holding-list div,
+.order-list div {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.25rem 0.8rem;
+  padding: 0.85rem;
+  background: var(--cream);
+}
+
+.holding-list strong,
+.order-list strong {
+  justify-self: end;
+}
+
+.holding-list small,
+.order-list small {
+  grid-column: 1 / -1;
+  text-transform: none;
+}
+
+.market-section,
+.orders-section {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+}
+
+.market-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.paper-search {
+  width: min(100%, 340px);
+  margin: 0;
+}
+
+.stock-table {
+  display: grid;
+  gap: 1px;
+  overflow: auto;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.stock-row {
+  display: grid;
+  min-width: 760px;
+  grid-template-columns: 82px minmax(190px, 1.2fr) minmax(170px, 1fr) 100px 80px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  color: var(--brown);
+  background: var(--cream);
+  border: 0;
+  cursor: pointer;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.stock-row.header {
+  color: var(--sage);
+  cursor: default;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stock-row.active,
+.stock-row:not(.header):hover {
+  background: var(--sage-pale);
+}
+
+.stock-row span:first-child {
+  color: var(--brown-deep);
+  font-weight: 500;
+}
+
 @media (max-width: 860px) {
   nav {
     gap: 1rem;
@@ -847,5 +1125,22 @@ footer {
 
   .chat-form {
     grid-template-columns: 1fr;
+  }
+
+  .paper-page {
+    padding-top: 2.5rem;
+  }
+
+  .paper-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .trade-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-row {
+    min-width: 680px;
+    grid-template-columns: 74px minmax(160px, 1.1fr) minmax(150px, 1fr) 90px 72px;
   }
 }

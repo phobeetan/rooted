@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { womenLedStocks } from './womenLedStocks.js'
 
 const stages = [
   {
@@ -154,6 +155,22 @@ const starterPrompts = [
   'How should I think about saving vs investing?',
 ]
 
+const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
+const paperKey = 'rooted-paper-portfolio'
+
+function freshPaperState() {
+  return { cash: 10000, positions: {}, orders: [] }
+}
+
+function readPaperState() {
+  try {
+    return JSON.parse(localStorage.getItem(paperKey)) || freshPaperState()
+  } catch {
+    return freshPaperState()
+  }
+}
+
 function CardGrid({ items, onSelect }) {
   return (
     <div className="grid">
@@ -268,6 +285,211 @@ function InvestmentChatbot() {
             <button className="btn-outline" type="submit" disabled={loading}>Send</button>
           </form>
           {error && <p className="chat-error">{error}</p>}
+        </section>
+      </section>
+    </main>
+  )
+}
+
+function PaperTrading() {
+  const [stocks, setStocks] = useState(womenLedStocks.map((stock) => ({ ...stock, price: 0, changePercent: 0 })))
+  const [coinbase, setCoinbase] = useState(null)
+  const [paper, setPaper] = useState(readPaperState)
+  const [selected, setSelected] = useState(womenLedStocks[0].symbol)
+  const [amount, setAmount] = useState('250')
+  const [query, setQuery] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/stocks')
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error)
+        setStocks(data.stocks)
+        setCoinbase(data.coinbase)
+      })
+      .catch((err) => setError(err.message || 'Stock data failed.'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(paperKey, JSON.stringify(paper))
+  }, [paper])
+
+  const active = stocks.find((stock) => stock.symbol === selected) || stocks[0]
+  const q = query.toLowerCase()
+  const filtered = stocks.filter((stock) => (
+    stock.symbol.toLowerCase().includes(q)
+    || stock.name.toLowerCase().includes(q)
+    || stock.leader.toLowerCase().includes(q)
+  ))
+  const holdings = Object.entries(paper.positions)
+    .map(([symbol, count]) => {
+      const stock = stocks.find((item) => item.symbol === symbol)
+      return stock ? { ...stock, shares: count, value: count * stock.price } : null
+    })
+    .filter(Boolean)
+  const holdingsValue = holdings.reduce((sum, item) => sum + item.value, 0)
+  const totalValue = paper.cash + holdingsValue
+
+  const placeOrder = (side) => {
+    const dollars = Number(amount)
+    if (!active?.price || dollars <= 0) {
+      setError('Enter a trade amount.')
+      return
+    }
+
+    if (side === 'buy' && dollars > paper.cash) {
+      setError('Not enough paper cash.')
+      return
+    }
+
+    const owned = paper.positions[active.symbol] || 0
+    const tradeShares = dollars / active.price
+    if (side === 'sell' && tradeShares > owned) {
+      setError('Not enough shares to sell.')
+      return
+    }
+
+    setPaper((current) => {
+      const signedShares = side === 'buy' ? tradeShares : -tradeShares
+      const nextShares = (current.positions[active.symbol] || 0) + signedShares
+      const positions = { ...current.positions, [active.symbol]: nextShares }
+      if (nextShares <= 0.000001) delete positions[active.symbol]
+
+      return {
+        cash: current.cash + (side === 'buy' ? -dollars : dollars),
+        positions,
+        orders: [
+          {
+            id: Date.now(),
+            side,
+            symbol: active.symbol,
+            shares: tradeShares,
+            price: active.price,
+            total: dollars,
+            time: new Date().toLocaleString(),
+          },
+          ...current.orders,
+        ].slice(0, 10),
+      }
+    })
+    setError('')
+  }
+
+  return (
+    <main className="paper-page">
+      <section className="paper-shell">
+        <div className="paper-head">
+          <div>
+            <div className="label">Paper trading</div>
+            <h1>Trade women-led companies with practice cash.</h1>
+            <p>Start with $10,000, buy fractional shares, and learn how positions move without placing real orders.</p>
+          </div>
+          <button className="btn-outline" type="button" onClick={() => setPaper(freshPaperState())}>Reset</button>
+        </div>
+
+        <div className="source-note">
+          {coinbase?.ok ? 'Coinbase API connected. ' : ''}
+          {coinbase?.note || 'Loading market status...'}
+        </div>
+
+        <div className="paper-metrics">
+          <div><span>Portfolio</span><strong>{usd.format(totalValue)}</strong></div>
+          <div><span>Cash</span><strong>{usd.format(paper.cash)}</strong></div>
+          <div><span>Holdings</span><strong>{usd.format(holdingsValue)}</strong></div>
+          <div><span>Stocks</span><strong>{stocks.length}</strong></div>
+        </div>
+
+        <section className="trade-layout">
+          <div className="trade-panel">
+            <span className="tag">{active?.sector}</span>
+            <h2>{active?.symbol} <span>{active?.name}</span></h2>
+            <p>Led by {active?.leader}</p>
+            <div className="price-line">
+              <strong>{active?.price ? usd.format(active.price) : 'Loading'}</strong>
+              <span className={active?.changePercent >= 0 ? 'up' : 'down'}>
+                {active?.changePercent >= 0 ? '+' : ''}{active?.changePercent || 0}%
+              </span>
+            </div>
+
+            <label className="trade-field">
+              Amount
+              <input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" />
+            </label>
+
+            <div className="trade-actions">
+              <button type="button" onClick={() => placeOrder('buy')}>Buy</button>
+              <button type="button" onClick={() => placeOrder('sell')}>Sell</button>
+            </div>
+            {error && <p className="trade-error">{error}</p>}
+          </div>
+
+          <div className="portfolio-panel">
+            <h2>Portfolio</h2>
+            {holdings.length ? (
+              <div className="holding-list">
+                {holdings.map((item) => (
+                  <div key={item.symbol}>
+                    <span>{item.symbol}</span>
+                    <strong>{usd.format(item.value)}</strong>
+                    <small>{shares.format(item.shares)} shares</small>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty">No positions yet.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="market-section">
+          <div className="market-toolbar">
+            <h2>Top 50 women-led stocks</h2>
+            <div className="search-row paper-search">
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search stock, company, or CEO" />
+            </div>
+          </div>
+
+          <div className="stock-table">
+            <div className="stock-row header">
+              <span>Symbol</span>
+              <span>Company</span>
+              <span>Leader</span>
+              <span>Price</span>
+              <span />
+            </div>
+            {filtered.map((stock) => (
+              <button className={`stock-row ${stock.symbol === active?.symbol ? 'active' : ''}`} key={stock.symbol} type="button" onClick={() => setSelected(stock.symbol)}>
+                <span>{stock.symbol}</span>
+                <span>{stock.name}</span>
+                <span>{stock.leader}</span>
+                <span>{stock.price ? usd.format(stock.price) : '...'}</span>
+                <span className={stock.changePercent >= 0 ? 'up' : 'down'}>
+                  {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent || 0}%
+                </span>
+              </button>
+            ))}
+          </div>
+          {loading && <p className="empty">Loading quotes...</p>}
+        </section>
+
+        <section className="orders-section">
+          <h2>Recent paper orders</h2>
+          {paper.orders.length ? (
+            <div className="order-list">
+              {paper.orders.map((order) => (
+                <div key={order.id}>
+                  <span>{order.side.toUpperCase()} {order.symbol}</span>
+                  <strong>{usd.format(order.total)}</strong>
+                  <small>{shares.format(order.shares)} @ {usd.format(order.price)} - {order.time}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="empty">No paper orders yet.</p>
+          )}
         </section>
       </section>
     </main>
@@ -462,6 +684,7 @@ function App() {
   const [selectedStartup, setSelectedStartup] = useState(null)
   const q = query.toLowerCase()
   const isChatbot = window.location.pathname.startsWith('/investment-chatbot')
+  const isPaperTrading = window.location.pathname.startsWith('/paper-trading')
 
   return (
     <>
@@ -469,13 +692,25 @@ function App() {
         <a className="word" href="/">Rooted</a>
         <ul>
           {isChatbot ? (
-            <li><a href="/">Home</a></li>
+            <>
+              <li><a href="/">Home</a></li>
+              <li><a href="/paper-trading">Paper Trade</a></li>
+              <li><a href="/login.html">Login</a></li>
+            </>
+          ) : isPaperTrading ? (
+            <>
+              <li><a href="/">Home</a></li>
+              <li><a href="/investment-chatbot">AI Assistant</a></li>
+              <li><a href="/login.html">Login</a></li>
+            </>
           ) : (
             <>
               <li><a href="#growth">Journey</a></li>
               <li><a href="#directory">Directory</a></li>
+              <li><a href="/paper-trading">Paper Trade</a></li>
               <li><a href="/investment-chatbot">AI Assistant</a></li>
-              <li><a href="#cta">Start</a></li>
+              <li><a href="/login.html">Login</a></li>
+              <li><a href="/onboarding.html">Start</a></li>
             </>
           )}
         </ul>
@@ -483,6 +718,8 @@ function App() {
 
       {isChatbot ? (
         <InvestmentChatbot />
+      ) : isPaperTrading ? (
+        <PaperTrading />
       ) : (
         <>
           <main>
@@ -531,7 +768,7 @@ function App() {
                       <div className="stat">12.8%</div>
                       <div className="stat-copy">Of U.S. patent inventors are women. <span className="src">Source: USPTO, Progress and Potential, 2019 data</span></div>
                     </div>
-                    <button className="btn-outline">Start your journey</button>
+                    <a className="btn-outline" href="/onboarding.html">Start your journey</a>
                   </div>
                   <p className="founder-copy">Submit your idea, get a novelty check against existing patents and products, and reach investors who are looking for exactly what you are building.</p>
                 </div>
@@ -545,7 +782,7 @@ function App() {
                   <h2>Plant something today.</h2>
                   <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
                 </div>
-                <button className="btn-outline">Get started</button>
+                <a className="btn-outline" href="/onboarding.html">Get started</a>
               </div>
               <footer>
                 <span>Rooted, 2026</span>
