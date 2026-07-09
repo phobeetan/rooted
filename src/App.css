@@ -172,6 +172,239 @@
   opacity: 0.7;
 }
 
+.brokerageApp {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.brokerageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid #d8dee5;
+}
+
+.brokerageHeader h1 {
+  margin: 8px 0 10px;
+  color: #101828;
+  font-size: 42px;
+  line-height: 1.1;
+}
+
+.brokerageHeader p {
+  max-width: 680px;
+  margin: 0;
+  color: #475467;
+}
+
+.brokerageHeader button {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #147a3d;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.brokerageHeader button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.brokerageEyebrow {
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #147a3d;
+  background: #e7f6ed;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.successMessage,
+.errorMessage {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.successMessage {
+  color: #14532d;
+  background: #dcfce7;
+}
+
+.errorMessage {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.accountSummary,
+.accountsGrid,
+.otherInvestments {
+  display: grid;
+  gap: 14px;
+}
+
+.accountSummary {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-top: 20px;
+}
+
+.accountSummary div,
+.accountCard,
+.otherInvestments article {
+  padding: 16px;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.accountSummary span,
+.otherInvestments span {
+  display: block;
+  margin-bottom: 8px;
+  color: #667085;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.accountSummary strong {
+  display: block;
+  color: #101828;
+  font-size: 20px;
+}
+
+.accountSummary small {
+  display: block;
+  margin-top: 4px;
+  color: #475467;
+}
+
+.positive {
+  color: #147a3d;
+}
+
+.accountsGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.accountCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.accountCard h2 {
+  margin: 0 0 6px;
+  color: #101828;
+  font-size: 20px;
+}
+
+.accountCard p,
+.sectionHeader p,
+.otherInvestments p {
+  margin: 0;
+  color: #667085;
+}
+
+.accountCard strong {
+  color: #101828;
+  font-size: 22px;
+}
+
+.brokerageSection {
+  margin-top: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 24px;
+}
+
+.positionsTableWrap {
+  overflow-x: auto;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.positionsTable {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.positionsTable th,
+.positionsTable td {
+  padding: 12px;
+  border-bottom: 1px solid #edf0f4;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.positionsTable th {
+  color: #344054;
+  background: #f8fafc;
+  font-size: 13px;
+}
+
+.positionsTable td {
+  color: #344054;
+}
+
+.positionsTable tr:last-child td {
+  border-bottom: 0;
+}
+
+.otherInvestments {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.otherInvestments h3 {
+  margin: 0 0 8px;
+  color: #101828;
+  font-size: 18px;
+}
+
+.otherInvestments strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #101828;
+  font-size: 22px;
+}
+
+.payloadPreview {
+  overflow: auto;
+  max-height: 560px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  color: #101828;
+  background: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 @media (max-width: 760px) {
   .app {
     padding: 32px 16px;
@@ -193,6 +426,31 @@
   }
 
   .startupList {
+    grid-template-columns: 1fr;
+  }
+
+  .brokerageApp {
+    padding: 24px 16px 40px;
+  }
+
+  .brokerageHeader,
+  .sectionHeader,
+  .accountCard {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .brokerageHeader h1 {
+    font-size: 34px;
+  }
+
+  .brokerageHeader button {
+    width: 100%;
+  }
+
+  .accountSummary,
+  .accountsGrid,
+  .otherInvestments {
     grid-template-columns: 1fr;
   }
 }
