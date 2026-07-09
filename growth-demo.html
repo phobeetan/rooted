@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rooted</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500&display=swap');
+
+  :root{
+    --sage:#5F7A57;
+    --sage-soft:#8FA187;
+    --sage-pale:#EDF1E8;
+    --rose:#B0677A;
+    --rose-soft:#D6A6B0;
+    --rose-pale:#F4E7EA;
+    --brown:#55402F;
+    --brown-deep:#2A1F16;
+    --cream:#F7F3EC;
+    --ink:#2A1F16;
+    --line:rgba(42,31,22,0.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;color:var(--brown-deep);}
+  .label{
+    font-size:0.7rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--sage);
+    font-weight:500;
+  }
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.4rem 6vw;
+    background:rgba(247,243,236,0.88);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .word{font-family:'Fraunces',serif;font-size:1.15rem;letter-spacing:0.01em;}
+  nav ul{display:flex;gap:2.2rem;list-style:none;}
+  nav a{color:var(--brown);text-decoration:none;font-size:0.85rem;letter-spacing:0.02em;}
+  nav a:hover{color:var(--rose);}
+
+  /* HERO */
+  .hero{
+    min-height:88vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:0 6vw;
+    position:relative;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .index{font-family:'Fraunces',serif;font-style:italic;font-size:0.9rem;color:var(--sage-soft);margin-bottom:1.5rem;}
+  .hero h1{
+    font-size:clamp(2.6rem,6.2vw,5.2rem);
+    line-height:1.02;
+    max-width:16ch;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 em{font-style:italic;color:var(--rose);}
+  .hero p{
+    margin-top:1.75rem;
+    max-width:36ch;
+    color:var(--brown);
+    font-size:1rem;
+    line-height:1.7;
+  }
+  .hero-foot{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-top:4rem;
+    padding-bottom:2.5rem;
+  }
+  .hero-foot .scroll{
+    display:flex;align-items:center;gap:0.6rem;
+    font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--brown);
+  }
+  .hero-foot .line{width:44px;height:1px;background:var(--brown);position:relative;overflow:hidden;}
+  .hero-foot .line::after{content:'';position:absolute;left:-44px;top:0;width:44px;height:1px;background:var(--rose);animation:slide 2s ease-in-out infinite;}
+  @keyframes slide{50%{left:0;}100%{left:44px;}}
+
+  /* GROWTH SECTION */
+  .growth-wrap{position:relative;height:560vh;}
+  .growth-pin{
+    position:sticky;top:0;height:100vh;
+    display:grid;grid-template-columns:0.85fr 1.15fr;
+    padding:0 6vw;
+    border-bottom:1px solid var(--line);
+  }
+  .growth-left{
+    display:flex;flex-direction:column;justify-content:center;
+    border-right:1px solid var(--line);
+    padding-right:4vw;
+    position:relative;
+  }
+  .chapter-index{
+    display:flex;gap:1.5rem;align-items:baseline;margin-bottom:2.5rem;
+  }
+  .chapter-index span{font-family:'Fraunces',serif;font-style:italic;font-size:1rem;color:var(--sage-soft);}
+  .chapter-rail{display:flex;flex-direction:column;gap:0.55rem;}
+  .chapter-rail .dot-row{display:flex;align-items:center;gap:0.7rem;}
+  .chapter-rail .dot{width:5px;height:5px;border-radius:50%;background:var(--line);transition:background 0.3s;}
+  .chapter-rail .dot.active{background:var(--rose);}
+  .chapter-rail .rname{font-size:0.75rem;color:var(--brown);opacity:0.55;letter-spacing:0.03em;transition:opacity 0.3s;}
+  .chapter-rail .rname.active{opacity:1;color:var(--rose);}
+
+  .text-viewport{height:230px;overflow:hidden;position:relative;margin-top:1.5rem;}
+  .text-track{position:absolute;top:0;left:0;width:100%;}
+  .stage{height:230px;display:flex;flex-direction:column;justify-content:center;}
+  .stage h2{font-size:clamp(1.6rem,2.4vw,2.1rem);margin-bottom:0.85rem;line-height:1.12;}
+  .stage p{color:var(--brown);line-height:1.7;font-size:0.95rem;max-width:32ch;}
+
+  .growth-right{
+    position:relative;display:flex;align-items:center;justify-content:center;
+  }
+
+  /* DIRECTORY */
+  .directory{padding:7rem 6vw;border-bottom:1px solid var(--line);}
+  .dir-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;flex-wrap:wrap;gap:1.5rem;}
+  .dir-head h2{font-size:clamp(1.8rem,3vw,2.6rem);}
+  .tabs{display:flex;gap:2.5rem;border-bottom:1px solid var(--line);margin-bottom:2.5rem;}
+  .tab{
+    background:none;border:none;font-family:'Inter',sans-serif;font-size:0.9rem;
+    color:var(--brown);opacity:0.5;padding:0.75rem 0;cursor:pointer;
+    border-bottom:2px solid transparent;letter-spacing:0.02em;
+  }
+  .tab.active{opacity:1;color:var(--brown-deep);border-color:var(--rose);}
+
+  .search-row{display:flex;align-items:center;gap:0.75rem;border-bottom:1px solid var(--line);padding-bottom:0.75rem;margin-bottom:2.5rem;max-width:420px;}
+  .search-row input{
+    border:none;background:none;outline:none;width:100%;
+    font-family:'Inter',sans-serif;font-size:0.95rem;color:var(--ink);
+  }
+  .search-row input::placeholder{color:var(--brown);opacity:0.45;}
+
+  .subhead{font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage);margin:2.5rem 0 1.25rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+  .card{background:var(--cream);padding:1.6rem;transition:background 0.2s;}
+  .card:hover{background:var(--sage-pale);}
+  .card .tag{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:0.75rem;display:inline-block;}
+  .card h3{font-size:1.15rem;margin-bottom:0.5rem;}
+  .card p{font-size:0.87rem;color:var(--brown);line-height:1.55;}
+  .card .meta{margin-top:1rem;font-size:0.75rem;color:var(--sage);letter-spacing:0.03em;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .founder-banner{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:2.5rem 0;border-bottom:1px solid var(--line);margin-bottom:2.5rem;flex-wrap:wrap;gap:2rem;
+  }
+  .founder-banner .stat{font-family:'Fraunces',serif;font-size:clamp(3rem,6vw,4.5rem);color:var(--rose);line-height:1;}
+  .founder-banner .stat-copy{max-width:34ch;font-size:0.9rem;color:var(--brown);line-height:1.65;}
+  .founder-banner .stat-copy .src{display:block;margin-top:0.5rem;font-size:0.72rem;color:var(--sage);letter-spacing:0.04em;}
+  .btn-outline{
+    font-family:'Inter',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;
+    background:none;border:1px solid var(--brown-deep);color:var(--brown-deep);
+    padding:0.85rem 1.8rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+  }
+  .btn-outline:hover{background:var(--brown-deep);color:var(--cream);}
+
+  /* CTA FOOTER */
+  .cta{
+    padding:6rem 6vw 4rem;
+    background:var(--brown-deep);color:var(--cream);
+  }
+  .cta .row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;}
+  .cta h2{color:var(--cream);font-size:clamp(1.9rem,3.4vw,2.8rem);max-width:16ch;}
+  .cta p{color:var(--sage-soft);margin-top:1rem;max-width:34ch;font-size:0.92rem;line-height:1.65;}
+  .cta .btn-outline{border-color:var(--rose-soft);color:var(--cream);}
+  .cta .btn-outline:hover{background:var(--rose-soft);color:var(--brown-deep);}
+  footer{margin-top:4rem;padding-top:2rem;border-top:1px solid rgba(247,243,236,0.15);display:flex;justify-content:space-between;font-size:0.75rem;color:var(--sage-soft);flex-wrap:wrap;gap:1rem;}
+
+  @media (max-width:860px){
+    .growth-pin{grid-template-columns:1fr;padding:0 6vw;}
+    .growth-left{border-right:none;padding-right:0;}
+    .growth-right{display:none;}
+    .text-viewport{height:260px;}
+    .stage{height:260px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="word">Rooted</span>
+  <ul>
+    <li><a href="#growth">Journey</a></li>
+    <li><a href="#directory">Directory</a></li>
+    <li><a href="#cta">Start</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="index">Chapter 00 — Begin</div>
+  <h1>Every first money move <em>starts small.</em></h1>
+  <p>A place for first-generation earners to learn, invest, and back each other — built for the moment finances, career, and independence all arrive at once.</p>
+  <div class="hero-foot">
+    <div class="scroll"><span>Scroll to grow</span><div class="line"></div></div>
+    <span class="label">2026</span>
+  </div>
+</section>
+
+<section class="growth-wrap" id="growth">
+  <div class="growth-pin">
+    <div class="growth-left">
+      <div class="chapter-rail" id="chapterRail">
+        <div class="dot-row"><div class="dot" data-i="0"></div><span class="rname" data-i="0">Root</span></div>
+        <div class="dot-row"><div class="dot" data-i="1"></div><span class="rname" data-i="1">Sprout</span></div>
+        <div class="dot-row"><div class="dot" data-i="2"></div><span class="rname" data-i="2">Sapling</span></div>
+        <div class="dot-row"><div class="dot" data-i="3"></div><span class="rname" data-i="3">Branch</span></div>
+        <div class="dot-row"><div class="dot" data-i="4"></div><span class="rname" data-i="4">Canopy</span></div>
+      </div>
+
+      <div class="text-viewport">
+        <div class="text-track" id="textTrack">
+          <div class="stage"><h2>Learn where you stand</h2><p>Income, rent, and what you're curious about. No jargon — just a starting point built around your actual numbers.</p></div>
+          <div class="stage"><h2>Build your first habit</h2><p>A savings cushion, a budget that fits your real life, and your first automated deposit.</p></div>
+          <div class="stage"><h2>Grow with intention</h2><p>Stocks, REITs, and funds aligned with what you care about — including women-led companies.</p></div>
+          <div class="stage"><h2>Back a founder, or become one</h2><p>Discover women-founded startups looking for support, or pitch your own idea to a community ready to invest.</p></div>
+          <div class="stage"><h2>Lead the next generation</h2><p>Mentor, invest, and pass down what you've learned — the canopy that shelters the next first-year student.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="growth-right">
+      <svg id="treeSvg" width="360" height="600" viewBox="0 0 360 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="180" cy="560" r="24" stroke="#5F7A57" stroke-width="1" opacity="0.25"/>
+        <circle cx="180" cy="560" r="40" stroke="#5F7A57" stroke-width="1" opacity="0.15"/>
+        <circle cx="180" cy="560" r="56" stroke="#5F7A57" stroke-width="1" opacity="0.08"/>
+
+        <path id="root1" d="M180 560 C 160 568, 135 572, 108 574" stroke="#55402F" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <path id="root2" d="M180 560 C 200 568, 225 572, 252 574" stroke="#55402F" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+
+        <path id="trunk" d="M180 560 C 178 470, 182 380, 180 250" stroke="#55402F" stroke-width="3" stroke-linecap="round"/>
+
+        <path id="branchL1" d="M180 450 C 145 432, 112 415, 86 380" stroke="#5F7A57" stroke-width="2" stroke-linecap="round"/>
+        <path id="branchR1" d="M180 430 C 215 412, 245 398, 275 365" stroke="#5F7A57" stroke-width="2" stroke-linecap="round"/>
+        <path id="branchL2" d="M180 360 C 148 338, 122 315, 106 280" stroke="#5F7A57" stroke-width="1.8" stroke-linecap="round"/>
+        <path id="branchR2" d="M180 340 C 210 318, 232 300, 254 268" stroke="#5F7A57" stroke-width="1.8" stroke-linecap="round"/>
+        <path id="branchL3" d="M180 290 C 160 268, 144 246, 136 214" stroke="#5F7A57" stroke-width="1.5" stroke-linecap="round"/>
+        <path id="branchR3" d="M180 280 C 202 258, 220 240, 232 208" stroke="#5F7A57" stroke-width="1.5" stroke-linecap="round"/>
+
+        <g id="marks" opacity="0">
+          <rect x="80" y="374" width="9" height="9" fill="#B0677A" transform="rotate(45 84.5 378.5)"/>
+          <rect x="270" y="359" width="8" height="8" fill="#8FA187" transform="rotate(45 274 363)"/>
+          <rect x="100" y="274" width="9" height="9" fill="#8FA187" transform="rotate(45 104.5 278.5)"/>
+          <rect x="249" y="262" width="8" height="8" fill="#B0677A" transform="rotate(45 253 266)"/>
+          <rect x="130" y="208" width="8" height="8" fill="#D6A6B0" transform="rotate(45 134 212)"/>
+          <rect x="226" y="202" width="7" height="7" fill="#5F7A57" transform="rotate(45 229.5 205.5)"/>
+          <rect x="175" y="178" width="11" height="11" fill="#B0677A" transform="rotate(45 180.5 183.5)"/>
+          <rect x="155" y="222" width="7" height="7" fill="#5F7A57" transform="rotate(45 158.5 225.5)"/>
+          <rect x="213" y="228" width="6" height="6" fill="#D6A6B0" transform="rotate(45 216 231)"/>
+          <rect x="177" y="248" width="8" height="8" fill="#8FA187" transform="rotate(45 181 252)"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="directory" id="directory">
+  <div class="dir-head">
+    <div>
+      <div class="label">Directory</div>
+      <h2>Find who you're building with</h2>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="investors">For investors</button>
+    <button class="tab" data-panel="founders">For founders</button>
+  </div>
+
+  <div class="panel active" id="panel-investors">
+    <div class="search-row">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55402F" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search startups or founders">
+    </div>
+
+    <div class="subhead">Startup directory</div>
+    <div class="grid" id="startupGrid"></div>
+
+    <div class="subhead">Founder directory</div>
+    <div class="grid" id="founderGrid"></div>
+  </div>
+
+  <div class="panel" id="panel-founders">
+    <div class="founder-banner">
+      <div>
+        <div class="stat">12.8%</div>
+        <div class="stat-copy">Of U.S. patent inventors are women. <span class="src">Source: USPTO, Progress and Potential, 2019 data</span></div>
+      </div>
+      <button class="btn-outline">Start your journey</button>
+    </div>
+    <p style="color:var(--brown);font-size:0.92rem;line-height:1.7;max-width:52ch;">Submit your idea, get a novelty check against existing patents and products, and reach investors who are looking for exactly what you're building.</p>
+  </div>
+</section>
+
+<section class="cta" id="cta">
+  <div class="row">
+    <div>
+      <div class="label" style="color:var(--rose-soft);">Ready when you are</div>
+      <h2>Plant something today.</h2>
+      <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
+    </div>
+    <button class="btn-outline">Get started</button>
+  </div>
+  <footer>
+    <span>Rooted, 2026</span>
+    <span>Built for first-generation earners and founders</span>
+  </footer>
+</section>
+
+<script>
+  const startups = [
+    {name:"Verdant Health", tag:"Biotech", one:"Diagnostics for conditions historically under-researched in women's health.", meta:"Seed · raising $500K"},
+    {name:"Ledger & Loom", tag:"Fintech", one:"Payroll infrastructure built for independent and gig-economy earners.", meta:"Pre-seed · raising $250K"},
+    {name:"Canopy Climate", tag:"Climate", one:"Carbon accounting software for small manufacturers.", meta:"Series A · closed"},
+    {name:"Marrow Materials", tag:"Hardware", one:"Biodegradable packaging from mycelium composites.", meta:"Seed · raising $400K"},
+    {name:"Fieldnote", tag:"AI", one:"Voice-to-structured-data tool for fieldwork researchers.", meta:"Pre-seed · raising $150K"},
+    {name:"Harbor Supply Co.", tag:"Consumer", one:"Direct-trade sourcing platform connecting small farms to retailers.", meta:"Seed · raising $300K"}
+  ];
+  const founders = [
+    {name:"Priya Anand", tag:"Biotech", one:"Ex-Genentech researcher, 2 patents pending in diagnostics.", meta:"Austin, TX"},
+    {name:"Dana Okafor", tag:"Fintech", one:"Former Stripe engineer, building payroll tools for gig workers.", meta:"Brooklyn, NY"},
+    {name:"Lucia Reyes", tag:"Climate", one:"Environmental engineer turned founder, MIT Climate fellow.", meta:"Boston, MA"},
+    {name:"Mei Tanaka", tag:"Hardware", one:"Materials scientist, holds 1 patent in composite biomaterials.", meta:"Seattle, WA"},
+    {name:"Amara Bello", tag:"AI", one:"NLP researcher, previously at a Series B applied-AI startup.", meta:"San Francisco, CA"},
+    {name:"Ines Duarte", tag:"Consumer", one:"Second-time founder, exited a DTC brand in 2023.", meta:"Chicago, IL"}
+  ];
+
+  function renderGrid(el, items){
+    el.innerHTML = items.map(i => `
+      <div class="card" data-name="${i.name.toLowerCase()}">
+        <span class="tag">${i.tag}</span>
+        <h3>${i.name}</h3>
+        <p>${i.one}</p>
+        <div class="meta">${i.meta}</div>
+      </div>
+    `).join('');
+  }
+
+  const startupGrid = document.getElementById('startupGrid');
+  const founderGrid = document.getElementById('founderGrid');
+  renderGrid(startupGrid, startups);
+  renderGrid(founderGrid, founders);
+
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    const q = e.target.value.toLowerCase();
+    renderGrid(startupGrid, startups.filter(s => s.name.toLowerCase().includes(q)));
+    renderGrid(founderGrid, founders.filter(f => f.name.toLowerCase().includes(q)));
+  });
+
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+    });
+  });
+
+  const growthWrap = document.getElementById('growth');
+  const textTrack = document.getElementById('textTrack');
+  const stageEls = document.querySelectorAll('.stage');
+  const numStages = stageEls.length;
+  const stageHeight = 230;
+
+  const dots = document.querySelectorAll('.chapter-rail .dot');
+  const rnames = document.querySelectorAll('.chapter-rail .rname');
+
+  const trunk = document.getElementById('trunk');
+  const branches = ['branchL1','branchR1','branchL2','branchR2','branchL3','branchR3'].map(id=>document.getElementById(id));
+  const roots = [document.getElementById('root1'), document.getElementById('root2')];
+  const marks = document.getElementById('marks');
+
+  function setupDash(el){
+    const len = el.getTotalLength();
+    el.style.strokeDasharray = len;
+    el.style.strokeDashoffset = len;
+    return len;
+  }
+  const trunkLen = setupDash(trunk);
+  const branchLens = branches.map(setupDash);
+
+  function lerp(a,b,t){ return a + (b-a)*Math.max(0,Math.min(1,t)); }
+
+  function update(){
+    const rect = growthWrap.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    let progress = -rect.top / total;
+    progress = Math.max(0, Math.min(1, progress));
+
+    const trackY = -progress * (numStages - 1) * stageHeight;
+    textTrack.style.transform = `translateY(${trackY}px)`;
+
+    stageEls.forEach((s,i)=>{
+      const center = i*stageHeight + stageHeight/2 + trackY;
+      const diff = Math.abs(center - stageHeight/2);
+      const op = Math.max(0, 1 - diff/(stageHeight*0.62));
+      s.style.opacity = op;
+    });
+
+    const activeIndex = Math.min(numStages-1, Math.round(progress*(numStages-1)));
+    dots.forEach((d,i)=>d.classList.toggle('active', i===activeIndex));
+    rnames.forEach((r,i)=>r.classList.toggle('active', i===activeIndex));
+
+    roots.forEach(r=>{ r.style.opacity = 0.4*(1-Math.min(progress/0.15,1)); });
+    trunk.style.strokeDashoffset = trunkLen*(1-Math.min(progress/0.3,1));
+
+    branchLens.forEach((len,i)=>{
+      const start = 0.28 + i*0.05;
+      const t = (progress-start)/0.22;
+      branches[i].style.strokeDashoffset = len*(1-Math.min(Math.max(t,0),1));
+    });
+
+    const markT = (progress-0.55)/0.35;
+    marks.style.opacity = Math.min(Math.max(markT,0),1);
+  }
+
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  update();
+</script>
+
+</body>
+</html>
