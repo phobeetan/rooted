@@ -1,0 +1,80 @@
+.app {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 320px;
+  justify-content: center;
+  border-bottom: 1px solid #d8dee5;
+}
+
+.eyebrow {
+  width: fit-content;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #0f766e;
+  background: #d9f4f0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #101828;
+  font-size: clamp(48px, 9vw, 96px);
+  line-height: 1;
+}
+
+.heroText {
+  max-width: 620px;
+  margin: 0;
+  color: #475467;
+  font-size: 20px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 28px;
+}
+
+.featureCard {
+  min-height: 150px;
+  padding: 20px;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.featureCard h2 {
+  margin: 0 0 10px;
+  color: #101828;
+  font-size: 22px;
+}
+
+.featureCard p {
+  margin: 0;
+  color: #667085;
+}
+
+@media (max-width: 760px) {
+  .app {
+    padding: 32px 16px;
+  }
+
+  .hero {
+    min-height: 280px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
