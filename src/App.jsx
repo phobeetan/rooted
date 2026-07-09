@@ -145,6 +145,15 @@ const founders = [
   { name: 'Ines Duarte', tag: 'Consumer', one: 'Second-time founder, exited a DTC brand in 2023.', meta: 'Chicago, IL' },
 ]
 
+const starterPrompts = [
+  'What is an ETF?',
+  'How should a beginner start investing?',
+  'What is the difference between stocks and index funds?',
+  'How do I understand risk in my portfolio?',
+  'How can investing support career independence?',
+  'How should I think about saving vs investing?',
+]
+
 function CardGrid({ items, onSelect }) {
   return (
     <div className="grid">
@@ -169,6 +178,99 @@ function CardGrid({ items, onSelect }) {
         )
       })}
     </div>
+  )
+}
+
+function InvestmentChatbot() {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: 'Hi, I can explain investing basics in plain language. I am here for education, not personalized financial advice.',
+    },
+  ])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const sendMessage = async (text = input) => {
+    const content = text.trim()
+    if (!content || loading) {
+      if (!content) setError('Type a question first.')
+      return
+    }
+
+    const nextMessages = [...messages, { role: 'user', content }]
+    setMessages(nextMessages)
+    setInput('')
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/investment-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextMessages.slice(-8) }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'The assistant could not respond.')
+      setMessages([...nextMessages, { role: 'assistant', content: data.reply }])
+    } catch (err) {
+      setError(err.message || 'Something went wrong.')
+      setMessages([...nextMessages, { role: 'assistant', content: 'I had trouble answering that. Please try again.' }])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="chat-page">
+      <section className="chat-shell">
+        <div className="chat-intro">
+          <div className="label">Financial education</div>
+          <h1>AI Investment Assistant</h1>
+          <p>Ask questions about investing, budgeting, portfolios, and financial confidence.</p>
+        </div>
+
+        <div className="prompt-row">
+          {starterPrompts.map((prompt) => (
+            <button type="button" key={prompt} onClick={() => sendMessage(prompt)} disabled={loading}>
+              {prompt}
+            </button>
+          ))}
+        </div>
+
+        <section className="chat-panel" aria-label="Investment assistant chat">
+          <div className="message-list" aria-live="polite">
+            {messages.map((message, index) => (
+              <div className={`message ${message.role}`} key={`${message.role}-${index}`}>
+                <span>{message.role === 'user' ? 'You' : 'Rooted AI'}</span>
+                <p>{message.content}</p>
+              </div>
+            ))}
+            {loading && (
+              <div className="message assistant">
+                <span>Rooted AI</span>
+                <p>Thinking...</p>
+              </div>
+            )}
+          </div>
+
+          <form className="chat-form" onSubmit={(event) => {
+            event.preventDefault()
+            sendMessage()
+          }}>
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="Ask an investment question"
+              disabled={loading}
+            />
+            <button className="btn-outline" type="submit" disabled={loading}>Send</button>
+          </form>
+          {error && <p className="chat-error">{error}</p>}
+        </section>
+      </section>
+    </main>
   )
 }
 
@@ -359,87 +461,101 @@ function App() {
   const [query, setQuery] = useState('')
   const [selectedStartup, setSelectedStartup] = useState(null)
   const q = query.toLowerCase()
+  const isChatbot = window.location.pathname.startsWith('/investment-chatbot')
 
   return (
     <>
       <nav>
-        <span className="word">Rooted</span>
+        <a className="word" href="/">Rooted</a>
         <ul>
-          <li><a href="#growth">Journey</a></li>
-          <li><a href="#directory">Directory</a></li>
-          <li><a href="#cta">Start</a></li>
+          {isChatbot ? (
+            <li><a href="/">Home</a></li>
+          ) : (
+            <>
+              <li><a href="#growth">Journey</a></li>
+              <li><a href="#directory">Directory</a></li>
+              <li><a href="/investment-chatbot">AI Assistant</a></li>
+              <li><a href="#cta">Start</a></li>
+            </>
+          )}
         </ul>
       </nav>
 
-      <main>
-        <section className="hero">
-          <div className="index">Chapter 00 - Begin</div>
-          <h1>Every first money move <em>starts small.</em></h1>
-          <p>A place for first-generation earners to learn, invest, and back each other, built for the moment finances, career, and independence all arrive at once.</p>
-          <div className="hero-foot">
-            <div className="scroll"><span>Scroll to grow</span><div className="line" /></div>
-            <span className="label">2026</span>
-          </div>
-        </section>
-
-        <Tree />
-
-        <section className="directory" id="directory">
-          <div className="dir-head">
-            <div>
-              <div className="label">Directory</div>
-              <h2>Find who you are building with</h2>
-            </div>
-          </div>
-
-          <div className="tabs">
-            <button className={`tab ${tab === 'investors' ? 'active' : ''}`} onClick={() => setTab('investors')}>For investors</button>
-            <button className={`tab ${tab === 'founders' ? 'active' : ''}`} onClick={() => setTab('founders')}>For founders</button>
-          </div>
-
-          {tab === 'investors' ? (
-            <div>
-              <div className="search-row">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55402F" strokeWidth="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search startups or founders" />
+      {isChatbot ? (
+        <InvestmentChatbot />
+      ) : (
+        <>
+          <main>
+            <section className="hero">
+              <div className="index">Chapter 00 - Begin</div>
+              <h1>Every first money move <em>starts small.</em></h1>
+              <p>A place for first-generation earners to learn, invest, and back each other, built for the moment finances, career, and independence all arrive at once.</p>
+              <div className="hero-foot">
+                <div className="scroll"><span>Scroll to grow</span><div className="line" /></div>
+                <span className="label">2026</span>
               </div>
+            </section>
 
-              <div className="subhead">Startup directory</div>
-              <CardGrid items={startups.filter((item) => item.name.toLowerCase().includes(q))} onSelect={setSelectedStartup} />
+            <Tree />
 
-              <div className="subhead">Founder directory</div>
-              <CardGrid items={founders.filter((item) => item.name.toLowerCase().includes(q))} />
-            </div>
-          ) : (
-            <div>
-              <div className="founder-banner">
+            <section className="directory" id="directory">
+              <div className="dir-head">
                 <div>
-                  <div className="stat">12.8%</div>
-                  <div className="stat-copy">Of U.S. patent inventors are women. <span className="src">Source: USPTO, Progress and Potential, 2019 data</span></div>
+                  <div className="label">Directory</div>
+                  <h2>Find who you are building with</h2>
                 </div>
-                <button className="btn-outline">Start your journey</button>
               </div>
-              <p className="founder-copy">Submit your idea, get a novelty check against existing patents and products, and reach investors who are looking for exactly what you are building.</p>
-            </div>
-          )}
-        </section>
 
-        <section className="cta" id="cta">
-          <div className="row">
-            <div>
-              <div className="label cta-label">Ready when you are</div>
-              <h2>Plant something today.</h2>
-              <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
-            </div>
-            <button className="btn-outline">Get started</button>
-          </div>
-          <footer>
-            <span>Rooted, 2026</span>
-            <span>Built for first-generation earners and founders</span>
-          </footer>
-        </section>
-      </main>
-      <StartupModal startup={selectedStartup} onClose={() => setSelectedStartup(null)} />
+              <div className="tabs">
+                <button className={`tab ${tab === 'investors' ? 'active' : ''}`} onClick={() => setTab('investors')}>For investors</button>
+                <button className={`tab ${tab === 'founders' ? 'active' : ''}`} onClick={() => setTab('founders')}>For founders</button>
+              </div>
+
+              {tab === 'investors' ? (
+                <div>
+                  <div className="search-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55402F" strokeWidth="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search startups or founders" />
+                  </div>
+
+                  <div className="subhead">Startup directory</div>
+                  <CardGrid items={startups.filter((item) => item.name.toLowerCase().includes(q))} onSelect={setSelectedStartup} />
+
+                  <div className="subhead">Founder directory</div>
+                  <CardGrid items={founders.filter((item) => item.name.toLowerCase().includes(q))} />
+                </div>
+              ) : (
+                <div>
+                  <div className="founder-banner">
+                    <div>
+                      <div className="stat">12.8%</div>
+                      <div className="stat-copy">Of U.S. patent inventors are women. <span className="src">Source: USPTO, Progress and Potential, 2019 data</span></div>
+                    </div>
+                    <button className="btn-outline">Start your journey</button>
+                  </div>
+                  <p className="founder-copy">Submit your idea, get a novelty check against existing patents and products, and reach investors who are looking for exactly what you are building.</p>
+                </div>
+              )}
+            </section>
+
+            <section className="cta" id="cta">
+              <div className="row">
+                <div>
+                  <div className="label cta-label">Ready when you are</div>
+                  <h2>Plant something today.</h2>
+                  <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
+                </div>
+                <button className="btn-outline">Get started</button>
+              </div>
+              <footer>
+                <span>Rooted, 2026</span>
+                <span>Built for first-generation earners and founders</span>
+              </footer>
+            </section>
+          </main>
+          <StartupModal startup={selectedStartup} onClose={() => setSelectedStartup(null)} />
+        </>
+      )}
     </>
   )
 }
