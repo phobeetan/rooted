@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { starterPrompts } from '../data/rootedData.js'
 import { getAssistantReply } from '../services/assistantService.js'
 
 const ADVISOR_GREETING = {
   role: 'assistant',
-  content: 'Hi, I explain investing basics in plain language. I am here for education, not personalized financial advice.',
+  content: 'Hi, I\'m Bud. I can explain investing basics and help you understand your Rooted portfolio in plain language.',
 }
 
-function InvestmentChatbot() {
+function InvestmentChatbot({ isOpen, onClose, onOpen }) {
   const [messages, setMessages] = useState([ADVISOR_GREETING])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const messageList = useRef(null)
+
+  useEffect(() => {
+    messageList.current?.scrollTo({ top: messageList.current.scrollHeight })
+  }, [isOpen, messages, loading])
 
   async function sendMessage(text = input) {
     const content = text.trim()
@@ -34,55 +39,75 @@ function InvestmentChatbot() {
     }
   }
 
-  return (
-    <main className="chat-page">
-      <section className="page-shell narrow">
-        <div className="page-head">
-          <p className="label">Financial education</p>
-          <h1>AI Investment Assistant</h1>
-          <p>Ask questions using your saved profile and Mock Fidelity investments as context.</p>
-        </div>
+  if (!isOpen) {
+    return (
+      <button className="bud-launcher" type="button" onClick={onOpen} aria-label="Open Bud">
+        <span className="bud-avatar" aria-hidden="true">B</span>
+        <span>Bud</span>
+      </button>
+    )
+  }
 
-        <div className="prompt-row">
+  return (
+    <aside className="bud-panel" aria-label="Bud, AI investment assistant">
+      <header className="bud-header">
+        <div className="bud-identity">
+          <span className="bud-avatar" aria-hidden="true">B</span>
+          <div>
+            <h2>Bud</h2>
+            <p><span aria-hidden="true" /> AI investment assistant</p>
+          </div>
+        </div>
+        <button className="bud-hide" type="button" onClick={onClose} aria-label="Hide Bud">
+          Hide
+          <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" width="16">
+            <path d="m9 5 7 7-7 7" />
+          </svg>
+        </button>
+      </header>
+
+      <section className="bud-suggestions" aria-label="Suggested questions">
+        <p>Try asking</p>
+        <div className="bud-prompt-row">
           {starterPrompts.map((prompt) => (
             <button type="button" key={prompt} onClick={() => sendMessage(prompt)} disabled={loading}>
               {prompt}
             </button>
           ))}
         </div>
-
-        <section className="chat-panel" aria-label="Investment assistant chat">
-          <div className="message-list" aria-live="polite">
-            {messages.map((message, index) => (
-              <div className={`message ${message.role}`} key={`${message.role}-${index}`}>
-                <span>{message.role === 'user' ? 'You' : 'Rooted AI'}</span>
-                <p>{message.content}</p>
-              </div>
-            ))}
-            {loading && (
-              <div className="message assistant">
-                <span>Rooted AI</span>
-                <p>Thinking...</p>
-              </div>
-            )}
-          </div>
-
-          <form className="chat-form" onSubmit={(event) => {
-            event.preventDefault()
-            sendMessage()
-          }}>
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask an investment question"
-              disabled={loading}
-            />
-            <button className="btn-outline" type="submit" disabled={loading}>Send</button>
-          </form>
-          {error && <p className="error-text">{error}</p>}
-        </section>
       </section>
-    </main>
+
+      <div className="bud-message-list" ref={messageList} aria-live="polite">
+        {messages.map((message, index) => (
+          <div className={`bud-message ${message.role}`} key={`${message.role}-${index}`}>
+            <span>{message.role === 'user' ? 'You' : 'Bud'}</span>
+            <p>{message.content}</p>
+          </div>
+        ))}
+        {loading && (
+          <div className="bud-message assistant">
+            <span>Bud</span>
+            <p>Thinking...</p>
+          </div>
+        )}
+      </div>
+
+      {error && <p className="bud-error" role="alert">{error}</p>}
+      <form className="bud-form" onSubmit={(event) => {
+        event.preventDefault()
+        sendMessage()
+      }}>
+        <input
+          aria-label="Message Bud"
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          placeholder="Message Bud"
+          disabled={loading}
+        />
+        <button type="submit" disabled={loading}>Send</button>
+      </form>
+      <p className="bud-disclaimer">Educational guidance, not personalized financial advice.</p>
+    </aside>
   )
 }
 

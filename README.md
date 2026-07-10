@@ -11,7 +11,7 @@ npm run dev
 
 ## Supabase
 
-Run `supabase/schema.sql` in the Supabase SQL Editor once. Then log in and open Mock Fidelity. Portfolio changes and simulated trades automatically sync to Supabase and the AI Assistant context.
+Run `supabase/schema.sql` in the Supabase SQL Editor once. Then log in and open Mock Fidelity. Portfolio changes and simulated trades automatically sync to Bud's context.
 
 ## Branches
 

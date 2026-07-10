@@ -2,7 +2,7 @@ export const growthStages = [
   {
     name: 'Trade',
     title: 'Trade',
-    copy: 'Practice buying and selling women-led stocks using cash from your mock Fidelity account. No real orders are placed.',
+    copy: 'Explore women-led companies connected to your mock Fidelity view.',
     path: '/trade',
   },
   {
@@ -12,9 +12,9 @@ export const growthStages = [
     path: '/mock-fidelity',
   },
   {
-    name: 'AI Assistant',
-    title: 'AI Assistant',
-    copy: 'Ask questions about your portfolio, startups, and the market, and get answers grounded in your real data.',
+    name: 'Bud',
+    title: 'Meet Bud',
+    copy: 'Ask Bud about your portfolio, startups, and the market, and get answers grounded in your real data.',
     path: '/investment-chatbot',
   },
   {

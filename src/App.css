@@ -14,6 +14,8 @@
   --ink: #243129;
   --muted: rgba(46, 59, 49, 0.68);
   --line: rgba(46, 59, 49, 0.16);
+  --nav-height: 68px;
+  --bud-panel-width: 400px;
 }
 
 html {
@@ -63,7 +65,7 @@ select {
 .site-nav {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 120;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -101,6 +103,266 @@ select {
 
 .site-nav a:hover {
   color: var(--root);
+}
+
+.app-content {
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.bud-panel {
+  position: fixed;
+  z-index: 100;
+  top: var(--nav-height);
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: min(var(--bud-panel-width), 100vw);
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  box-shadow: -18px 0 50px rgba(46, 59, 49, 0.12);
+}
+
+.bud-header {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: var(--forest);
+  border-bottom: 1px solid rgba(255, 250, 241, 0.14);
+}
+
+.bud-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.bud-avatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--forest);
+  background: var(--petal);
+  border-radius: 50%;
+  font-family: Fraunces, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.bud-identity h2 {
+  color: var(--paper);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.bud-identity p {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0;
+  color: rgba(255, 250, 241, 0.65);
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.bud-identity p span {
+  width: 0.4rem;
+  height: 0.4rem;
+  background: #a7c98c;
+  border-radius: 50%;
+}
+
+.bud-hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.55rem 0.5rem 0.7rem;
+  color: var(--paper);
+  background: transparent;
+  border: 1px solid rgba(255, 250, 241, 0.3);
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.bud-hide:hover {
+  background: rgba(255, 250, 241, 0.1);
+}
+
+.bud-suggestions {
+  padding: 0.85rem 1rem 0.95rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.bud-suggestions > p {
+  margin: 0 0 0.55rem;
+  color: var(--sage);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.bud-prompt-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.bud-prompt-row::-webkit-scrollbar {
+  display: none;
+}
+
+.bud-prompt-row button {
+  flex: 0 0 auto;
+  max-width: 210px;
+  padding: 0.6rem 0.7rem;
+  color: var(--forest);
+  background: var(--sage-soft);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.bud-prompt-row button:hover {
+  border-color: var(--sage);
+}
+
+.bud-prompt-row button:disabled,
+.bud-form button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.bud-message-list {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--cream);
+}
+
+.bud-message {
+  max-width: 88%;
+  padding: 0.75rem 0.85rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.bud-message.user {
+  align-self: flex-end;
+  background: var(--sage-soft);
+}
+
+.bud-message.assistant {
+  align-self: flex-start;
+  background: rgba(239, 185, 169, 0.2);
+}
+
+.bud-message span {
+  display: block;
+  color: var(--sage);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bud-message p {
+  margin: 0.3rem 0 0;
+  color: var(--forest);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.bud-error {
+  padding: 0.65rem 1rem 0;
+  margin: 0;
+  color: var(--rose);
+  background: var(--paper);
+  font-size: 0.75rem;
+}
+
+.bud-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem 0.5rem;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.bud-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem 0.8rem;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  outline: none;
+}
+
+.bud-form input:focus {
+  border-color: var(--sage);
+}
+
+.bud-form button {
+  padding: 0.7rem 0.85rem;
+  color: var(--paper);
+  background: var(--forest);
+  border: 1px solid var(--forest);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bud-disclaimer {
+  padding: 0 1rem 0.65rem;
+  margin: 0;
+  color: var(--muted);
+  background: var(--paper);
+  font-size: 0.62rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.bud-launcher {
+  position: fixed;
+  z-index: 90;
+  right: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.8rem 0.55rem 0.55rem;
+  color: var(--paper);
+  background: var(--forest);
+  border: 1px solid rgba(255, 250, 241, 0.22);
+  box-shadow: 0 10px 28px rgba(46, 59, 49, 0.22);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.bud-launcher .bud-avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 0.9rem;
 }
 
 .hero {
@@ -481,10 +743,10 @@ select {
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: transparent;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
 }
 
 .info-card {
@@ -493,6 +755,8 @@ select {
   color: inherit;
   background: var(--paper);
   border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   text-align: left;
 }
 
@@ -1003,7 +1267,7 @@ select {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 200;
   display: grid;
   place-items: center;
   padding: 1.25rem;
@@ -1114,6 +1378,10 @@ select {
 }
 
 @media (max-width: 860px) {
+  :root {
+    --nav-height: 116px;
+  }
+
   .site-nav {
     align-items: flex-start;
     flex-direction: column;
@@ -1148,6 +1416,10 @@ select {
     grid-template-columns: 1fr 1fr;
   }
 
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .message,
   .modal-cols {
     max-width: 100%;
@@ -1160,6 +1432,14 @@ select {
 }
 
 @media (max-width: 560px) {
+  .bud-panel {
+    width: 100%;
+  }
+
+  .bud-suggestions {
+    padding-right: 0;
+  }
+
   .site-nav ul {
     justify-content: flex-start;
   }
@@ -1173,6 +1453,10 @@ select {
   }
 
   .account-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-grid {
     grid-template-columns: 1fr;
   }
 }

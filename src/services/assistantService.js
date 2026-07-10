@@ -6,9 +6,9 @@ import { TRADE_STORAGE_KEY } from './tradePortfolio.js'
 
 // Set VITE_GEMINI_API_KEY in a .env.local file (gitignored) to enable real
 // Gemini replies. Without it, getAssistantReply falls back to the rule-based
-// local reply so the demo still works offline or if the call fails.
+// local reply so the app still works offline or if the call fails.
 const GEMINI_API_KEY = import.meta.env?.VITE_GEMINI_API_KEY
-const GEMINI_MODEL = 'gemini-3.5-flash'
+const GEMINI_MODEL = 'gemini-3.1-flash-lite'
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
 function buildPortfolioSummary(investments = []) {
@@ -54,10 +54,10 @@ function buildContextBlock({ profile, investments }) {
     profile ? `- Approximate monthly income after annual salary is divided by 12: ${usd.format(monthlyIncome)}; amount before taxes after reported spending: ${usd.format(monthlyIncome - spending)}.` : '',
     profile ? `- Main goal: ${profile.goals || 'not provided'}. Financial knowledge: ${profile.financialKnowledge || 'not provided'}.` : '',
     ``,
-    `Mock Fidelity investments from Supabase:`,
+    `Saved investment account data from Supabase:`,
     positions.length
       ? `- ${positions.length} saved positions across ${new Set(positions.map((p) => p.account)).size} accounts, with ${usd.format(totalValue)} invested and ${usd.format(totalCash)} in cash.`
-      : `- No investments are saved. Ask the user to log in and open Mock Fidelity; changes sync automatically.`,
+      : `- No investments are saved. Ask the user to log in and open their investment account; changes sync automatically.`,
     topPosition ? `- Largest listed position: ${topPosition.symbol} (${topPosition.name}) at ${usd.format(topPosition.value)}.` : '',
     positions.length ? `- Full holdings: ${positions.map((p) => `${p.symbol} ${p.allocation.toFixed(1)}% (${p.type}, ${p.account}, ${usd.format(p.value)}${p.quantity ? `, ${p.quantity.toFixed(4)} shares at ${usd.format(p.price)}` : ''})`).join(', ')}.` : '',
     ``,
@@ -127,9 +127,9 @@ function getLocalReply(messages, context) {
   const parts = []
 
   if (positions.length) {
-    parts.push(`Looking at ${context.profile?.name ? `${context.profile.name}'s` : 'your'} saved Mock Fidelity data, there are ${usd.format(totalValue)} invested, ${usd.format(totalCash)} in cash, and the largest position is ${topPosition.symbol} at ${usd.format(topPosition.value)}.`)
+    parts.push(`Looking at ${context.profile?.name ? `${context.profile.name}'s` : 'your'} saved investment data, there are ${usd.format(totalValue)} invested, ${usd.format(totalCash)} in cash, and the largest position is ${topPosition.symbol} at ${usd.format(topPosition.value)}.`)
   } else {
-    parts.push('I do not see saved Mock Fidelity investments yet. Log in and open Mock Fidelity; changes sync automatically.')
+    parts.push('I do not see saved investments yet. Log in and open your investment account; changes sync automatically.')
   }
 
   if (context.profile) {
@@ -167,11 +167,11 @@ function getLocalReply(messages, context) {
 }
 
 function buildSystemPrompt(context) {
-  return `You are Rooted AI, the in-app investment advisor for the Rooted platform. The user's saved profile and Mock Fidelity investments are fetched from Supabase for each message. Other available app context is also provided below.
+  return `You are Bud, the in-app investment advisor for the Rooted platform. The user's saved profile and investment data are fetched from Supabase for each message. Other available app context is also provided below.
 
 Act as a knowledgeable, personable investment advisor: reason across all of these sources together (e.g. flag concentration risk in their brokerage holdings, suggest specific startups from the directory that match their interests or fill a gap in their portfolio, reference what the community is saying about similar decisions, and factor in their simulated trading behavior as a signal of risk appetite).
 
-Be specific and cite the actual names, tickers, and numbers from the context rather than speaking generically. Keep responses focused and conversational (a few short paragraphs, not an essay). This is a demo with fictional/mock data, so it's safe to give direct, opinionated suggestions — but close with a brief one-line reminder that this is a hackathon demo, not licensed financial advice.
+Be specific and cite the actual names, tickers, and numbers from the context rather than speaking generically. Keep responses focused and conversational (a few short paragraphs, not an essay). Close with a brief one-line reminder that this is educational information, not licensed financial advice.
 
 Respond in plain conversational text only — no markdown formatting (no asterisks, no bold/italic syntax, no headers). If you need a list, write it as short sentences or a simple dash-prefixed line, not markdown bullets.
 

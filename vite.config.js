@@ -5,7 +5,7 @@ import { womenLedStocks } from './src/womenLedStocks.js'
 
 const page = (path) => fileURLToPath(new URL(path, import.meta.url))
 
-const systemPrompt = `You are Rooted's AI Investment Assistant. You help users understand investing in simple, beginner-friendly language. Focus on financial education, long-term thinking, risk awareness, diversification, and confidence-building.
+const systemPrompt = `You are Bud, Rooted's AI investment assistant. You help users understand investing in simple, beginner-friendly language. Focus on financial education, long-term thinking, risk awareness, diversification, and confidence-building.
 
 You are not a licensed financial advisor. Do not tell users exactly what stock to buy or sell. Do not guarantee returns. When users ask for specific investment decisions, explain the tradeoffs, risks, and general principles instead.
 
@@ -67,7 +67,7 @@ function fallbackQuote(stock) {
     change,
     changePercent,
     asOf: new Date().toISOString(),
-    source: 'demo',
+    source: 'fallback',
   }
 }
 
@@ -149,7 +149,7 @@ function mockReply(messages) {
   }
 
   if (question.includes('portfolio') || question.includes('allocation') || question.includes('concentrated')) {
-    return `This mock portfolio is worth about $${mockPortfolioContext.totalPortfolioValue.toLocaleString()} with about $${mockPortfolioContext.cashBalance.toLocaleString()} in cash. The largest sample holding is VOO at ${mockPortfolioContext.positions[1].allocationPercent}%, which usually means a broad U.S. stock-market fund is doing a lot of the work. Concentration risk rises when one company or sector becomes a large share, so compare each holding against your goals and risk tolerance.`
+    return `This portfolio is worth about $${mockPortfolioContext.totalPortfolioValue.toLocaleString()} with about $${mockPortfolioContext.cashBalance.toLocaleString()} in cash. The largest holding is VOO at ${mockPortfolioContext.positions[1].allocationPercent}%, which usually means a broad U.S. stock-market fund is doing a lot of the work. Concentration risk rises when one company or sector becomes a large share, so compare each holding against your goals and risk tolerance.`
   }
 
   if (question.includes('etf')) {
@@ -195,7 +195,7 @@ async function openAiReply(messages) {
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || 'gpt-5.6',
       reasoning: { effort: 'low' },
-      instructions: `${systemPrompt}\n\nMock portfolio context for demo only:\n${JSON.stringify(mockPortfolioContext, null, 2)}`,
+      instructions: `${systemPrompt}\n\nPortfolio context:\n${JSON.stringify(mockPortfolioContext, null, 2)}`,
       input: messages.map((message) => ({
         role: message.role,
         content: message.content,
@@ -310,7 +310,7 @@ function mockFidelityApi(req, res, next) {
         return sendJson(res, 400, { message: 'Invalid mock Fidelity payload.' })
       }
       lastMockFidelityImport = payload
-      return sendJson(res, 200, { message: 'Mock Fidelity data received.' })
+      return sendJson(res, 200, { message: 'Investment data received.' })
     })
     .catch(() => sendJson(res, 400, { message: 'Invalid JSON payload.' }))
 }

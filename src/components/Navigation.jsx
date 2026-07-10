@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { onAuthChange } from '../../scripts/services/supabaseService.js'
 
 const links = [
   ['/', 'Home'],
-  ['/#growth', 'Journey'],
   ['/#directory', 'Directory'],
   ['/trade', 'Trade'],
   ['/mock-fidelity', 'Mock Fidelity'],
-  ['/investment-chatbot', 'AI Assistant'],
   ['/salary-negotiation', 'Salary Negotiation'],
   ['/startups', 'Startups'],
   ['/forum', 'Forum'],
@@ -15,16 +14,25 @@ const links = [
 
 function Navigation() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => onAuthChange((user) => setLoggedIn(Boolean(user))), [])
 
+  function openSection(event, href) {
+    event.preventDefault()
+    navigate(href)
+    requestAnimationFrame(() => document.getElementById(href.slice(2))?.scrollIntoView())
+  }
+
   return (
     <nav className="site-nav">
-      <a className="brand" href="/">Rooted</a>
+      <Link className="brand" to="/">Rooted</Link>
       <ul>
         {links.map(([href, label]) => (
           <li key={href}>
-            <a href={href}>{label}</a>
+            {href.includes('#')
+              ? <a href={href} onClick={(event) => openSection(event, href)}>{label}</a>
+              : <Link to={href}>{label}</Link>}
           </li>
         ))}
         {loggedIn ? (

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Navigation from './components/Navigation.jsx'
 import Forum from './pages/Forum.jsx'
@@ -11,22 +12,31 @@ import Startups from './pages/Startups.jsx'
 import './App.css'
 
 function App() {
+  const [isBudOpen, setIsBudOpen] = useState(() => window.location.pathname === '/investment-chatbot')
+
   return (
-    <>
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/investment-chatbot" element={<InvestmentChatbot />} />
-        <Route path="/salary-negotiation" element={<SalaryNegotiation />} />
-        <Route path="/startups" element={<Startups />} />
-        <Route path="/trade" element={<PaperTrading />} />
-        <Route path="/paper-trading" element={<Navigate replace to="/trade" />} />
-        <Route path="/mock-fidelity" element={<MockFidelity />} />
-        <Route path="/rooted/mock-fidelity-received" element={<MockImportPreview />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-    </>
+    <div className="app-shell">
+      <div className="app-content">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/forum" element={<Forum />} />
+          <Route path="/investment-chatbot" element={<Navigate replace to="/" />} />
+          <Route path="/salary-negotiation" element={<SalaryNegotiation />} />
+          <Route path="/startups" element={<Startups />} />
+          <Route path="/trade" element={<PaperTrading />} />
+          <Route path="/paper-trading" element={<Navigate replace to="/trade" />} />
+          <Route path="/mock-fidelity" element={<MockFidelity />} />
+          <Route path="/rooted/mock-fidelity-received" element={<MockImportPreview />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </div>
+      <InvestmentChatbot
+        isOpen={isBudOpen}
+        onClose={() => setIsBudOpen(false)}
+        onOpen={() => setIsBudOpen(true)}
+      />
+    </div>
   )
 }
 
