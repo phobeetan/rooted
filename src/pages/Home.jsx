@@ -26,7 +26,7 @@ function Home() {
           <h1>Build wealth. Build freedom.</h1>
           <p>A calm place to learn, practice investing, find women-led companies, and back founders growing from the same roots.</p>
           <div className="hero-foot">
-            <a className="btn-outline" href="/onboarding.html">Start</a>
+            <a className="btn-outline" href="/login.html?mode=signup">Start</a>
             <div className="scroll"><span>Scroll to grow</span><div className="line" /></div>
           </div>
         </section>
@@ -73,7 +73,7 @@ function Home() {
                 <small>Source: USPTO, Progress and Potential, 2019 data</small>
               </div>
               <p>Submit your idea, get a novelty check against existing patents and products, and reach investors looking for what you are building.</p>
-              <a className="btn-outline" href="/onboarding.html">Start your journey</a>
+              <a className="btn-outline" href="/login.html?mode=signup">Start your journey</a>
             </div>
           )}
         </section>
@@ -84,7 +84,7 @@ function Home() {
             <h2>Plant something today.</h2>
             <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
           </div>
-          <a className="btn-outline" href="/onboarding.html">Get started</a>
+          <a className="btn-outline" href="/login.html?mode=signup">Get started</a>
         </section>
       </main>
 

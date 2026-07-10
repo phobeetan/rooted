@@ -1,5 +1,5 @@
 import { createUserProfile } from '../../models/UserProfile.js';
-import { createAccount, saveUserProfile, checkEmailExists } from '../services/firebaseService.js';
+import { createAccount } from '../services/supabaseService.js';
 
 /** Validate email format */
 export function validateEmail(email) {
@@ -72,13 +72,7 @@ export async function completeOnboarding(step1Data, step2Data) {
     return { success: false, message: 'Validation failed', errors: { ...v1.errors, ...v2.errors } };
   }
 
-  // Check email and create/save
   try {
-    const exists = await checkEmailExists(step1Data.email);
-    if (exists) return { success: false, message: 'Email already registered' };
-
-    const uid = await createAccount(step1Data.email, step1Data.password);
-
     const profile = createUserProfile({
       name: step1Data.name,
       birthday: step1Data.birthday,
@@ -90,8 +84,8 @@ export async function completeOnboarding(step1Data, step2Data) {
       financialKnowledge: step2Data.financialKnowledge
     });
 
-    await saveUserProfile(uid, profile);
-    return { success: true, uid };
+    const user = await createAccount(step1Data.email, step1Data.password, profile);
+    return { success: true, uid: user.id };
   } catch (err) {
     return { success: false, message: err.message || 'Failed to complete onboarding' };
   }

@@ -1,21 +1,31 @@
+import { useEffect, useState } from 'react'
+import { onAuthChange } from '../../scripts/services/supabaseService.js'
+
 const links = [
   ['/', 'Home'],
   ['/#growth', 'Journey'],
   ['/#directory', 'Directory'],
   ['/startups', 'Startups'],
-  ['/paper-trading', 'Paper Trade'],
+  ['/trade', 'Trade'],
   ['/investment-chatbot', 'AI Assistant'],
   ['/forum', 'Forum'],
   ['/mock-fidelity', 'Mock Fidelity'],
-  ['/login.html', 'Login'],
 ]
 
 function Navigation() {
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => onAuthChange((user) => setLoggedIn(Boolean(user))), [])
+
+  const authLinks = loggedIn
+    ? [['/dashboard.html', 'Profile']]
+    : [['/login.html?mode=login', 'Log in'], ['/login.html?mode=signup', 'Sign up']]
+
   return (
     <nav className="site-nav">
       <a className="brand" href="/">Rooted</a>
       <ul>
-        {links.map(([href, label]) => (
+        {[...links, ...authLinks].map(([href, label]) => (
           <li key={href}>
             <a href={href}>{label}</a>
           </li>

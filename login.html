@@ -3,40 +3,111 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login - Rooted</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Log in or Sign up - Rooted</title>
     <link rel="stylesheet" href="styles/global.css">
-    <style>
-      body{background:#f7fafc;margin:0}
-      .wrap{max-width:540px;margin:8vh auto;padding:28px 24px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(10,10,20,.06)}
-      h1{margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-      .form-group{margin-bottom:16px}
-      label{display:block;margin-bottom:6px;font-weight:600}
-      input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
-      #login-error{color:#dc3545;margin-top:8px}
-      .actions{display:flex;gap:8px;margin-top:18px}
-      .btn{padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
-      .btn-primary{background:#0b76ff;color:#fff}
-      a{color:#0b76ff}
-    </style>
   </head>
-  <body>
-    <main class="wrap">
-      <h1>Sign in</h1>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="login-email">Email</label>
-          <input id="login-email" type="email" required />
+  <body class="auth-page">
+    <main class="auth-shell">
+      <a class="auth-brand" href="/">Rooted</a>
+
+      <section class="auth-card" id="auth-card">
+        <div class="auth-head">
+          <p>Account</p>
+          <h1>Log in or sign up</h1>
         </div>
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <input id="login-password" type="password" required />
+
+        <div class="auth-tabs" role="tablist" aria-label="Account">
+          <button type="button" data-mode="login">Log in</button>
+          <button type="button" data-mode="signup">Sign up</button>
         </div>
-        <div id="login-error" role="alert"></div>
-        <div class="actions">
-          <button type="submit" id="login-btn" class="btn btn-primary">Sign in</button>
-          <a href="index.html" class="btn">Back</a>
+
+        <form id="login-form" class="auth-form" data-panel="login">
+          <label>
+            Email
+            <input id="login-email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            Password
+            <input id="login-password" type="password" autocomplete="current-password" required />
+          </label>
+          <div id="login-error" class="form-error" role="alert"></div>
+          <button type="submit" id="login-btn" class="primary-btn">Log in</button>
+        </form>
+
+        <form id="signup-form" class="auth-form" data-panel="signup">
+          <label>
+            Full name
+            <input id="signup-name" type="text" autocomplete="name" required />
+          </label>
+          <label>
+            Birthday
+            <input id="signup-birthday" type="date" required />
+          </label>
+          <label>
+            Email
+            <input id="signup-email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            Password
+            <input id="signup-password" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+          <label>
+            Confirm password
+            <input id="signup-confirm" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+          <label>
+            Occupation
+            <input id="signup-occupation" type="text" autocomplete="organization-title" />
+          </label>
+          <div class="two-col">
+            <label>
+              Annual salary
+              <input id="signup-salary" type="number" min="0" inputmode="decimal" required />
+            </label>
+            <label>
+              Monthly spending
+              <input id="signup-spending" type="number" min="0" inputmode="decimal" required />
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Goal
+              <select id="signup-goals" required>
+                <option value="">Choose one</option>
+                <option>Short-term</option>
+                <option>Long-term</option>
+              </select>
+            </label>
+            <label>
+              Knowledge
+              <select id="signup-knowledge" required>
+                <option value="">Choose one</option>
+                <option>No background</option>
+                <option>Some knowledge</option>
+                <option>Moderately knowledgeable</option>
+                <option>Proficient</option>
+              </select>
+            </label>
+          </div>
+          <div id="signup-error" class="form-error" role="alert"></div>
+          <button type="submit" id="signup-btn" class="primary-btn">Sign up</button>
+        </form>
+      </section>
+
+      <section class="auth-card profile-card" id="profile-card" hidden>
+        <div class="auth-head">
+          <p>Profile</p>
+          <h1>You are logged in</h1>
         </div>
-      </form>
+        <p id="profile-email" class="muted-text"></p>
+        <div class="quick-links">
+          <a class="primary-btn link-btn" href="/dashboard.html">Profile</a>
+          <a href="/trade">Trade</a>
+          <a href="/investment-chatbot">AI Assistant</a>
+          <a href="/forum">Forum</a>
+        </div>
+      </section>
     </main>
 
     <script type="module" src="./scripts/viewcontrollers/loginController.js"></script>

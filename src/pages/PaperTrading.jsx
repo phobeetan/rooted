@@ -3,24 +3,24 @@ import { womenLedStocks } from '../womenLedStocks.js'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
-const paperKey = 'rooted-paper-portfolio'
+const tradeKey = 'rooted-trade-portfolio'
 
-function freshPaperState() {
+function freshTradeState() {
   return { cash: 10000, positions: {}, orders: [] }
 }
 
-function readPaperState() {
+function readTradeState() {
   try {
-    return JSON.parse(localStorage.getItem(paperKey)) || freshPaperState()
+    return JSON.parse(localStorage.getItem(tradeKey)) || freshTradeState()
   } catch {
-    return freshPaperState()
+    return freshTradeState()
   }
 }
 
 function PaperTrading() {
   const [stocks, setStocks] = useState(womenLedStocks.map((stock) => ({ ...stock, price: 0, changePercent: 0 })))
   const [coinbase, setCoinbase] = useState(null)
-  const [paper, setPaper] = useState(readPaperState)
+  const [trade, setTrade] = useState(readTradeState)
   const [selected, setSelected] = useState(womenLedStocks[0].symbol)
   const [amount, setAmount] = useState('250')
   const [query, setQuery] = useState('')
@@ -40,8 +40,8 @@ function PaperTrading() {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(paperKey, JSON.stringify(paper))
-  }, [paper])
+    localStorage.setItem(tradeKey, JSON.stringify(trade))
+  }, [trade])
 
   const active = stocks.find((stock) => stock.symbol === selected) || stocks[0]
   const q = query.toLowerCase()
@@ -50,25 +50,25 @@ function PaperTrading() {
     || stock.name.toLowerCase().includes(q)
     || stock.leader.toLowerCase().includes(q)
   ))
-  const holdings = Object.entries(paper.positions)
+  const holdings = Object.entries(trade.positions)
     .map(([symbol, count]) => {
       const stock = stocks.find((item) => item.symbol === symbol)
       return stock ? { ...stock, shares: count, value: count * stock.price } : null
     })
     .filter(Boolean)
   const holdingsValue = holdings.reduce((sum, item) => sum + item.value, 0)
-  const totalValue = paper.cash + holdingsValue
+  const totalValue = trade.cash + holdingsValue
 
   function placeOrder(side) {
     const dollars = Number(amount)
     if (!active?.price || dollars <= 0) return setError('Enter a trade amount.')
-    if (side === 'buy' && dollars > paper.cash) return setError('Not enough paper cash.')
+    if (side === 'buy' && dollars > trade.cash) return setError('Not enough cash.')
 
-    const owned = paper.positions[active.symbol] || 0
+    const owned = trade.positions[active.symbol] || 0
     const tradeShares = dollars / active.price
     if (side === 'sell' && tradeShares > owned) return setError('Not enough shares to sell.')
 
-    setPaper((current) => {
+    setTrade((current) => {
       const nextShares = (current.positions[active.symbol] || 0) + (side === 'buy' ? tradeShares : -tradeShares)
       const positions = { ...current.positions, [active.symbol]: nextShares }
       if (nextShares <= 0.000001) delete positions[active.symbol]
@@ -91,15 +91,15 @@ function PaperTrading() {
   }
 
   return (
-    <main className="paper-page">
+    <main className="trade-page">
       <section className="page-shell">
         <div className="page-head split">
           <div>
-            <p className="label">Paper trading</p>
+            <p className="label">Trade</p>
             <h1>Trade women-led companies with practice cash.</h1>
             <p>Start with $10,000, buy fractional shares, and learn how positions move without placing real orders.</p>
           </div>
-          <button className="btn-outline" type="button" onClick={() => setPaper(freshPaperState())}>Reset</button>
+          <button className="btn-outline" type="button" onClick={() => setTrade(freshTradeState())}>Reset</button>
         </div>
 
         <div className="source-note">
@@ -109,7 +109,7 @@ function PaperTrading() {
 
         <div className="metric-grid">
           <div><span>Portfolio</span><strong>{usd.format(totalValue)}</strong></div>
-          <div><span>Cash</span><strong>{usd.format(paper.cash)}</strong></div>
+          <div><span>Cash</span><strong>{usd.format(trade.cash)}</strong></div>
           <div><span>Holdings</span><strong>{usd.format(holdingsValue)}</strong></div>
           <div><span>Stocks</span><strong>{stocks.length}</strong></div>
         </div>
@@ -182,10 +182,10 @@ function PaperTrading() {
         </section>
 
         <section className="panel">
-          <h2>Recent paper orders</h2>
-          {paper.orders.length ? (
+          <h2>Recent orders</h2>
+          {trade.orders.length ? (
             <div className="mini-list">
-              {paper.orders.map((order) => (
+              {trade.orders.map((order) => (
                 <div key={order.id}>
                   <span>{order.side.toUpperCase()} {order.symbol}</span>
                   <strong>{usd.format(order.total)}</strong>
@@ -194,7 +194,7 @@ function PaperTrading() {
               ))}
             </div>
           ) : (
-            <p className="empty">No paper orders yet.</p>
+            <p className="empty">No orders yet.</p>
           )}
         </section>
       </section>

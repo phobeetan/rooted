@@ -18,6 +18,7 @@ function App() {
         <Route path="/forum" element={<Forum />} />
         <Route path="/investment-chatbot" element={<InvestmentChatbot />} />
         <Route path="/startups" element={<Startups />} />
+        <Route path="/trade" element={<PaperTrading />} />
         <Route path="/paper-trading" element={<PaperTrading />} />
         <Route path="/mock-fidelity" element={<MockFidelity />} />
         <Route path="/rooted/mock-fidelity-received" element={<MockImportPreview />} />

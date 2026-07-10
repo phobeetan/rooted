@@ -57,7 +57,7 @@ function StatCarousel({ slides }) {
     <section className="stat-carousel" aria-label="Funding statistics">
       <div className="stat-track" style={{ transform: `translateX(-${index * 100}%)` }}>
         {slides.map((stat, slideIndex) => (
-          <StatSlide stat={stat} active={slideIndex === index} key={stat.source} />
+          <StatSlide stat={stat} active={slideIndex === index} key={`${stat.source}-${slideIndex}`} />
         ))}
       </div>
       <div className="carousel-controls">
@@ -67,7 +67,7 @@ function StatCarousel({ slides }) {
             <button
               aria-label={`Go to slide ${dotIndex + 1}`}
               className={dotIndex === index ? 'active' : ''}
-              key={stat.source}
+              key={`${stat.source}-${dotIndex}`}
               type="button"
               onClick={() => go(dotIndex)}
             />

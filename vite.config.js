@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
 import { womenLedStocks } from './src/womenLedStocks.js'
@@ -24,6 +24,7 @@ const mockPortfolioContext = {
 
 let stockCache = null
 let coinbaseCache = null
+const marketNewsCache = new Map()
 let lastMockFidelityImport = null
 
 function readJson(req) {
@@ -234,6 +235,64 @@ function stocksApi(req, res, next) {
     .catch((error) => sendJson(res, 500, { error: error.message || 'Stock data failed.' }))
 }
 
+function cleanNewsQuery(value) {
+  return String(value || '').trim().slice(0, 80)
+}
+
+function newsArticle(item) {
+  const entity = item.entities?.[0] || {}
+  return {
+    title: item.title || '',
+    description: item.description || item.snippet || '',
+    snippet: item.snippet || '',
+    url: item.url || '',
+    imageUrl: item.image_url || '',
+    source: item.source || '',
+    publishedAt: item.published_at || '',
+    symbol: entity.symbol || '',
+  }
+}
+
+async function marketauxNews(query, token) {
+  if (!token) return { articles: [], message: 'Add MARKETAUX_API_TOKEN to load live Marketaux news.' }
+
+  const key = query || 'latest'
+  const cached = marketNewsCache.get(key)
+  if (cached && Date.now() - cached.time < 300000) return cached.value
+
+  const params = new URLSearchParams({
+    api_token: token,
+    countries: 'us',
+    language: 'en',
+    limit: '6',
+    group_similar: 'true',
+  })
+  if (query) params.set('search', query)
+  else params.set('entity_types', 'equity,index')
+
+  const response = await fetch(`https://api.marketaux.com/v1/news/all?${params}`)
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.error?.message || 'Marketaux request failed.')
+
+  const value = {
+    articles: (data.data || []).map(newsArticle).filter((item) => item.title && item.url),
+  }
+  marketNewsCache.set(key, { time: Date.now(), value })
+  return value
+}
+
+function marketNewsApi(token) {
+  return (req, res, next) => {
+    const url = new URL(req.url, 'http://localhost')
+    if (url.pathname !== '/api/market-news') return next()
+    if (req.method !== 'GET') return sendJson(res, 405, { error: 'Use GET.' })
+
+    marketauxNews(cleanNewsQuery(url.searchParams.get('q')), token)
+      .then((data) => sendJson(res, 200, data))
+      .catch((error) => sendJson(res, 500, { error: error.message || 'Market news failed.' }))
+  }
+}
+
 function mockFidelityApi(req, res, next) {
   const url = new URL(req.url, 'http://localhost')
   if (url.pathname !== '/api/mock-fidelity/import') return next()
@@ -257,32 +316,39 @@ function mockFidelityApi(req, res, next) {
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'investment-chat-api',
-      configureServer(server) {
-        server.middlewares.use(stocksApi)
-        server.middlewares.use(investmentChatApi)
-        server.middlewares.use(mockFidelityApi)
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const marketauxToken = env.MARKETAUX_API_TOKEN || env.VITE_MARKETAUX_API_TOKEN
+
+  return {
+    plugins: [
+      react(),
+      {
+        name: 'investment-chat-api',
+        configureServer(server) {
+          server.middlewares.use(stocksApi)
+          server.middlewares.use(investmentChatApi)
+          server.middlewares.use(marketNewsApi(marketauxToken))
+          server.middlewares.use(mockFidelityApi)
+        },
+        configurePreviewServer(server) {
+          server.middlewares.use(stocksApi)
+          server.middlewares.use(investmentChatApi)
+          server.middlewares.use(marketNewsApi(marketauxToken))
+          server.middlewares.use(mockFidelityApi)
+        },
       },
-      configurePreviewServer(server) {
-        server.middlewares.use(stocksApi)
-        server.middlewares.use(investmentChatApi)
-        server.middlewares.use(mockFidelityApi)
+    ],
+    build: {
+      rollupOptions: {
+        input: {
+          main: page('./index.html'),
+          login: page('./login.html'),
+          onboarding: page('./onboarding.html'),
+          dashboard: page('./dashboard.html'),
+        },
+        external: (id) => id.startsWith('https://'),
       },
     },
-  ],
-  build: {
-    rollupOptions: {
-      input: {
-        main: page('./index.html'),
-        login: page('./login.html'),
-        onboarding: page('./onboarding.html'),
-        dashboard: page('./dashboard.html'),
-      },
-      external: (id) => id.startsWith('https://'),
-    },
-  },
+  }
 })

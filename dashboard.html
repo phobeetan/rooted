@@ -3,20 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>Dashboard - Rooted</title>
   <link rel="stylesheet" href="styles/global.css">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 60px 20px; }
-    .container { max-width: 600px; margin: 0 auto; }
-    h1 { color: #333; }
-    p { color: #666; font-size: 1.1rem; }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Welcome to Rooted</h1>
-    <p>Your dashboard is coming soon. We're building something amazing for you.</p>
-    <p><a href="/">Return to home</a></p>
-  </div>
+<body class="dashboard-page">
+  <nav class="site-nav">
+    <a class="brand" href="/">Rooted</a>
+    <ul aria-label="Main navigation">
+      <li><a href="/">Home</a></li>
+      <li><a href="/#growth">Journey</a></li>
+      <li><a href="/#directory">Directory</a></li>
+      <li><a href="/startups">Startups</a></li>
+      <li><a href="/trade">Trade</a></li>
+      <li><a href="/investment-chatbot">AI Assistant</a></li>
+      <li><a href="/forum">Forum</a></li>
+      <li><a href="/mock-fidelity">Mock Fidelity</a></li>
+      <li><button class="nav-button" id="signout-btn" type="button">Sign out</button></li>
+    </ul>
+  </nav>
+
+  <main class="dashboard-shell">
+
+    <section class="dashboard-head">
+      <p>Profile</p>
+      <h1 id="dashboard-title">Your dashboard</h1>
+      <span id="dashboard-email"></span>
+      <small id="database-status">Syncing Supabase profile...</small>
+    </section>
+
+    <section class="metric-grid" aria-label="Financial numbers">
+      <div><span>Annual salary</span><strong id="salary">$0</strong></div>
+      <div><span>Monthly income</span><strong id="monthly-income">$0</strong></div>
+      <div><span>Monthly spending</span><strong id="monthly-spending">$0</strong></div>
+      <div><span>Monthly leftover</span><strong id="monthly-leftover">$0</strong></div>
+      <div><span>Savings rate</span><strong id="savings-rate">0%</strong></div>
+    </section>
+
+    <section class="dashboard-section" aria-label="App features">
+      <div class="section-head">
+        <div>
+          <p class="label">Explore</p>
+          <h2>Pick up where you left off</h2>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <a href="/trade"><span>Trade</span><strong>Practice stock moves</strong></a>
+        <a href="/investment-chatbot"><span>AI Assistant</span><strong>Ask investing questions</strong></a>
+        <a href="/startups"><span>Startups</span><strong>Explore women-led companies</strong></a>
+        <a href="/forum"><span>Forum</span><strong>Join the community</strong></a>
+      </div>
+    </section>
+
+    <section class="dashboard-section" aria-label="Profile details">
+      <div class="section-head">
+        <div>
+          <p class="label">Profile details</p>
+          <h2>Your saved information</h2>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div>
+          <span>Name</span>
+          <strong id="profile-name">-</strong>
+        </div>
+        <div>
+          <span>Birthday</span>
+          <strong id="profile-birthday">-</strong>
+        </div>
+        <div>
+          <span>Occupation</span>
+          <strong id="profile-occupation">-</strong>
+        </div>
+        <div>
+          <span>Goal</span>
+          <strong id="profile-goals">-</strong>
+        </div>
+        <div>
+          <span>Knowledge</span>
+          <strong id="profile-knowledge">-</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section" aria-label="Market news">
+      <div class="section-head">
+        <div>
+          <p class="label">Market news</p>
+          <h2>What the market is watching</h2>
+        </div>
+      </div>
+      <form class="news-search" id="market-news-form">
+        <span>Search</span>
+        <input id="market-news-query" type="search" placeholder="Search markets, companies, or tickers">
+      </form>
+      <p class="news-status" id="market-news-status">Loading market news...</p>
+      <div class="news-grid" id="market-news-list"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./scripts/viewcontrollers/dashboardController.js"></script>
 </body>
 </html>

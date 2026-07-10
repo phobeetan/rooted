@@ -1,6 +1,6 @@
 /**
  * Onboarding Controller - handles DOM events and user interactions
- * No Firebase calls here, all business logic delegated to viewModel
+ * No database calls here, all business logic is delegated to the view model.
  */
 
 import * as viewModel from '../viewmodels/onboardingViewModel.js';
