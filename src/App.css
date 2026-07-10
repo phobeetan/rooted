@@ -308,38 +308,11 @@ select {
   text-transform: uppercase;
 }
 
-.carousel-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.85rem;
-  border-top: 1px solid var(--line);
-}
-
-.carousel-controls button,
 .tabs button {
   color: var(--forest);
   background: transparent;
   border: 0;
   cursor: pointer;
-}
-
-.carousel-dots {
-  display: flex;
-  gap: 0.45rem;
-}
-
-.carousel-dots button {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border-radius: 50%;
-  background: rgba(96, 120, 79, 0.3);
-}
-
-.carousel-dots button.active {
-  background: var(--root);
 }
 
 .growth-wrap {
@@ -910,6 +883,15 @@ select {
 
 .startup-card {
   padding: 1.35rem;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.startup-card:hover,
+.startup-card:focus-visible {
+  background: var(--sage-soft);
 }
 
 .startup-card-head,

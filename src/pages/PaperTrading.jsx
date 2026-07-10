@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
+import { mockFidelity } from '../data/rootedData.js'
 import { womenLedStocks } from '../womenLedStocks.js'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
-const tradeKey = 'rooted-trade-portfolio'
+const tradeKey = 'rooted-trade-portfolio-fidelity'
+const fidelityCash = mockFidelity.accounts.reduce((sum, account) => sum + account.cash, 0)
 
 function freshTradeState() {
-  return { cash: 10000, positions: {}, orders: [] }
+  return { cash: fidelityCash, positions: {}, orders: [] }
 }
 
 function readTradeState() {
@@ -97,7 +99,7 @@ function PaperTrading() {
           <div>
             <p className="label">Trade</p>
             <h1>Trade women-led companies with practice cash.</h1>
-            <p>Start with $10,000, buy fractional shares, and learn how positions move without placing real orders.</p>
+            <p>Use the cash in your mock Fidelity account to buy fractional shares without placing real orders.</p>
           </div>
           <button className="btn-outline" type="button" onClick={() => setTrade(freshTradeState())}>Reset</button>
         </div>
@@ -109,7 +111,7 @@ function PaperTrading() {
 
         <div className="metric-grid">
           <div><span>Portfolio</span><strong>{usd.format(totalValue)}</strong></div>
-          <div><span>Cash</span><strong>{usd.format(trade.cash)}</strong></div>
+          <div><span>Fidelity cash</span><strong>{usd.format(trade.cash)}</strong></div>
           <div><span>Holdings</span><strong>{usd.format(holdingsValue)}</strong></div>
           <div><span>Stocks</span><strong>{stocks.length}</strong></div>
         </div>

@@ -73,7 +73,6 @@ class DashboardController {
     text('profile-occupation', profile.occupation || '-');
     text('profile-goals', profile.goals || '-');
     text('profile-knowledge', profile.financialKnowledge || '-');
-    text('database-status', profile.databaseStatus || `Synced to Supabase profiles/${user.id}`);
   }
 
   async loadNews() {

@@ -4,13 +4,16 @@ import GrowingTree from '../components/GrowingTree.jsx'
 import StatCarousel from '../components/StatCarousel.jsx'
 import StartupModal from '../components/StartupModal.jsx'
 import { founders, startups, stats } from '../data/rootedData.js'
+import { onAuthChange } from '../../scripts/services/supabaseService.js'
 
 function Home() {
   const logoRef = useRef(null)
   const [tab, setTab] = useState('investors')
   const [query, setQuery] = useState('')
   const [selectedStartup, setSelectedStartup] = useState(null)
+  const [loggedIn, setLoggedIn] = useState(false)
   const q = query.trim().toLowerCase()
+  const startHref = loggedIn ? '/dashboard.html' : '/login.html?mode=signup'
 
   const startupMatches = startups.filter((item) => (
     item.name.toLowerCase().includes(q) || item.tag.toLowerCase().includes(q)
@@ -35,6 +38,8 @@ function Home() {
     return () => window.removeEventListener('scroll', animateLogo)
   }, [])
 
+  useEffect(() => onAuthChange((user) => setLoggedIn(Boolean(user))), [])
+
   return (
     <>
       <main>
@@ -44,7 +49,7 @@ function Home() {
           <h1>Build wealth. Build freedom.</h1>
           <p>A calm place to learn, practice investing, find women-led companies, and back founders growing from the same roots.</p>
           <div className="hero-foot">
-            <a className="btn-outline" href="/login.html?mode=signup">Start</a>
+            <a className="btn-outline" href={startHref}>{loggedIn ? 'Dashboard' : 'Start'}</a>
             <div className="scroll"><span>Scroll to grow</span><div className="line" /></div>
           </div>
         </section>
@@ -91,7 +96,7 @@ function Home() {
                 <small>Source: USPTO, Progress and Potential, 2019 data</small>
               </div>
               <p>Submit your idea, get a novelty check against existing patents and products, and reach investors looking for what you are building.</p>
-              <a className="btn-outline" href="/login.html?mode=signup">Start your journey</a>
+              <a className="btn-outline" href={startHref}>{loggedIn ? 'Dashboard' : 'Start your journey'}</a>
             </div>
           )}
         </section>
@@ -102,7 +107,7 @@ function Home() {
             <h2>Plant something today.</h2>
             <p>Ten minutes to set up your profile. A lifetime of compounding.</p>
           </div>
-          <a className="btn-outline" href="/login.html?mode=signup">Get started</a>
+          <a className="btn-outline" href={startHref}>{loggedIn ? 'Dashboard' : 'Get started'}</a>
         </section>
       </main>
 

@@ -187,6 +187,57 @@ export const startups = [
       next: 'Concentrate on one city.',
     },
   },
+  {
+    name: 'Mosaic Mind',
+    tag: 'Education',
+    one: 'Adaptive tutoring tools for multilingual middle-school students.',
+    meta: 'Seed - raising $350K',
+    stage: 'Seed',
+    detail: 'Helping tutors build lessons that adapt to each student while supporting families in their home language.',
+    people: ['Leila Hassan - CEO', 'Camila Torres - Learning Science', 'Avery James - Engineering'],
+    jobs: [{ title: 'Curriculum Fellow', req: 'Teaching experience, 5 hrs/week' }],
+    evaluation: {
+      score: 8,
+      verdict: 'Strong',
+      upside: 'Clear need among schools serving multilingual families.',
+      risk: 'School sales cycles can be long.',
+      next: 'Run a semester pilot with two schools.',
+    },
+  },
+  {
+    name: 'Nurture Route',
+    tag: 'Health',
+    one: 'Care coordination for postpartum families and local providers.',
+    meta: 'Pre-seed - raising $200K',
+    stage: 'Pre-seed',
+    detail: 'Giving new parents one place to manage appointments, recovery plans, and trusted community resources.',
+    people: ['Zara Mitchell - Founder', 'Keisha Grant - Care Ops', 'Noor Rahman - Product'],
+    jobs: [],
+    evaluation: {
+      score: 7,
+      verdict: 'Promising',
+      upside: 'High-need care window with fragmented support.',
+      risk: 'Provider integrations may be slow.',
+      next: 'Test referrals with one hospital network.',
+    },
+  },
+  {
+    name: 'Circuit Bloom',
+    tag: 'Hardware',
+    one: 'Repairable sensor kits that help small farms reduce water waste.',
+    meta: 'Idea - seeking pilot partners',
+    stage: 'Idea',
+    detail: 'Designing low-cost soil sensors with replaceable parts and a simple mobile dashboard for small farms.',
+    people: ['Anika Desai - Founder', 'Morgan Lee - Hardware', 'Elise Carter - Agriculture'],
+    jobs: [{ title: 'Prototype Assistant', req: 'Basic electronics or CAD experience' }],
+    evaluation: {
+      score: 6,
+      verdict: 'Early',
+      upside: 'Affordable repairable hardware stands out.',
+      risk: 'Still needs field validation.',
+      next: 'Deploy ten prototypes with local growers.',
+    },
+  },
 ]
 
 export const founders = [
@@ -196,6 +247,9 @@ export const founders = [
   { name: 'Mei Tanaka', tag: 'Hardware', one: 'Materials scientist with a patent in composite biomaterials.', meta: 'Seattle, WA' },
   { name: 'Amara Bello', tag: 'AI', one: 'NLP researcher, previously at a Series B applied-AI startup.', meta: 'San Francisco, CA' },
   { name: 'Ines Duarte', tag: 'Consumer', one: 'Second-time founder who exited a DTC brand in 2023.', meta: 'Chicago, IL' },
+  { name: 'Leila Hassan', tag: 'Education', one: 'Former bilingual teacher building adaptive learning tools for multilingual students.', meta: 'Denver, CO' },
+  { name: 'Zara Mitchell', tag: 'Health', one: 'Community health strategist focused on better postpartum care access.', meta: 'Atlanta, GA' },
+  { name: 'Anika Desai', tag: 'Hardware', one: 'Mechanical engineer designing repairable technology for small farms.', meta: 'Madison, WI' },
 ]
 
 export const starterPrompts = [

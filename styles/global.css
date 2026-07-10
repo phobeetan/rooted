@@ -176,12 +176,6 @@ p {
   color: var(--muted);
 }
 
-.dashboard-head small {
-  display: block;
-  margin-top: 0.55rem;
-  color: var(--sage);
-}
-
 .section-head {
   display: flex;
   flex-wrap: wrap;
@@ -241,6 +235,16 @@ p {
 
 .feature-grid a:hover {
   background: var(--sage-soft);
+}
+
+.feature-grid .feature-icon {
+  color: var(--root);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.feature-grid small {
+  color: var(--muted);
 }
 
 .news-search {

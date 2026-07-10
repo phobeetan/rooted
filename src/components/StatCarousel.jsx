@@ -43,15 +43,11 @@ function StatSlide({ stat, active }) {
 
 function StatCarousel({ slides }) {
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
 
   useEffect(() => {
-    if (paused) return undefined
     const id = setInterval(() => setIndex((current) => (current + 1) % slides.length), 5000)
     return () => clearInterval(id)
-  }, [paused, slides.length])
-
-  const go = (next) => setIndex((next + slides.length) % slides.length)
+  }, [slides.length])
 
   return (
     <section className="stat-carousel" aria-label="Funding statistics">
@@ -59,24 +55,6 @@ function StatCarousel({ slides }) {
         {slides.map((stat, slideIndex) => (
           <StatSlide stat={stat} active={slideIndex === index} key={`${stat.source}-${slideIndex}`} />
         ))}
-      </div>
-      <div className="carousel-controls">
-        <button type="button" onClick={() => go(index - 1)}>Prev</button>
-        <div className="carousel-dots">
-          {slides.map((stat, dotIndex) => (
-            <button
-              aria-label={`Go to slide ${dotIndex + 1}`}
-              className={dotIndex === index ? 'active' : ''}
-              key={`${stat.source}-${dotIndex}`}
-              type="button"
-              onClick={() => go(dotIndex)}
-            />
-          ))}
-        </div>
-        <button type="button" onClick={() => go(index + 1)}>Next</button>
-        <button type="button" onClick={() => setPaused((current) => !current)}>
-          {paused ? 'Play' : 'Pause'}
-        </button>
       </div>
     </section>
   )
