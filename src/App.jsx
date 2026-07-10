@@ -160,6 +160,33 @@ const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
 const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
 const paperKey = 'rooted-paper-portfolio'
 
+const mockFidelity = {
+  provider: 'mock_fidelity',
+  accountHolder: 'Demo User',
+  accounts: [
+    {
+      type: 'Individual Brokerage',
+      value: 42850.75,
+      cash: 2355.87,
+      positions: [
+        ['AAPL', 'Apple', 'stock', 2622, 6.12],
+        ['MSFT', 'Microsoft', 'stock', 8949.6, 20.89],
+        ['VOO', 'Vanguard S&P 500 ETF', 'etf', 11328.8, 26.44],
+        ['FSKAX', 'Fidelity Total Market Index', 'mutual fund', 9099.23, 21.23],
+      ],
+    },
+    {
+      type: 'Roth IRA',
+      value: 18425.12,
+      cash: 1100,
+      positions: [
+        ['VOO', 'Vanguard S&P 500 ETF', 'etf', 10195.92, 55.34],
+        ['FSKAX', 'Fidelity Total Market Index', 'mutual fund', 7131.08, 38.7],
+      ],
+    },
+  ],
+}
+
 function freshPaperState() {
   return { cash: 10000, positions: {}, orders: [] }
 }
@@ -497,6 +524,122 @@ function PaperTrading() {
   )
 }
 
+function MockFidelity() {
+  const [status, setStatus] = useState('')
+  const totalValue = mockFidelity.accounts.reduce((sum, account) => sum + account.value, 0)
+  const totalCash = mockFidelity.accounts.reduce((sum, account) => sum + account.cash, 0)
+  const positions = mockFidelity.accounts.flatMap((account) =>
+    account.positions.map(([symbol, name, type, value, allocation]) => ({
+      account: account.type,
+      symbol,
+      name,
+      type,
+      value,
+      allocation,
+    })),
+  )
+
+  async function sendMockData() {
+    setStatus('sending')
+    try {
+      const response = await fetch('/api/mock-fidelity/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...mockFidelity, syncedAt: new Date().toISOString() }),
+      })
+      if (!response.ok) throw new Error('Request failed')
+      setStatus('sent')
+    } catch {
+      setStatus('failed')
+    }
+  }
+
+  return (
+    <main className="mock-page">
+      <section className="mock-hero">
+        <div>
+          <div className="label">Fake brokerage demo</div>
+          <h1>Mock Fidelity Account</h1>
+          <p>Local demo data only. No Fidelity login or real account connection is used.</p>
+        </div>
+        <button className="btn-outline" type="button" onClick={sendMockData} disabled={status === 'sending'}>
+          {status === 'sending' ? 'Sending...' : 'Send Data to Rooted'}
+        </button>
+      </section>
+
+      {status === 'sent' && <p className="mock-note">Mock Fidelity data sent to Rooted.</p>}
+      {status === 'failed' && <p className="mock-note error">Failed to send mock Fidelity data.</p>}
+
+      <section className="mock-grid" aria-label="Mock Fidelity summary">
+        <div><span>Account holder</span><strong>{mockFidelity.accountHolder}</strong></div>
+        <div><span>Total value</span><strong>{usd.format(totalValue)}</strong></div>
+        <div><span>Cash</span><strong>{usd.format(totalCash)}</strong></div>
+        <div><span>Accounts</span><strong>{mockFidelity.accounts.length}</strong></div>
+      </section>
+
+      <section className="mock-table-wrap" aria-label="Mock Fidelity positions">
+        <table className="mock-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Allocation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {positions.map((position) => (
+              <tr key={`${position.account}-${position.symbol}`}>
+                <td>{position.account}</td>
+                <td>{position.symbol}</td>
+                <td>{position.name}</td>
+                <td>{position.type}</td>
+                <td>{usd.format(position.value)}</td>
+                <td>{position.allocation.toFixed(2)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  )
+}
+
+function MockImportPreview() {
+  const [payload, setPayload] = useState(null)
+  const [error, setError] = useState('')
+
+  async function loadImport() {
+    setError('')
+    try {
+      const response = await fetch('/api/mock-fidelity/import')
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.message || 'Request failed')
+      setPayload(result.data)
+    } catch {
+      setPayload(null)
+      setError('No mock Fidelity data has been received yet.')
+    }
+  }
+
+  return (
+    <main className="mock-page">
+      <section className="mock-hero">
+        <div>
+          <div className="label">Rooted receiver</div>
+          <h1>Last Mock Fidelity Import</h1>
+          <p>Shows the last mock brokerage payload received during this dev session.</p>
+        </div>
+        <button className="btn-outline" type="button" onClick={loadImport}>Load Last Import</button>
+      </section>
+      {error && <p className="mock-note error">{error}</p>}
+      {payload && <pre className="mock-payload">{JSON.stringify(payload, null, 2)}</pre>}
+    </main>
+  )
+}
+
 function StartupModal({ startup, onClose }) {
   if (!startup) return null
 
@@ -687,6 +830,8 @@ function App() {
   const isChatbot = window.location.pathname.startsWith('/investment-chatbot')
   const isPaperTrading = window.location.pathname.startsWith('/paper-trading')
   const isForum = window.location.pathname.startsWith('/forum')
+  const isMockFidelity = window.location.pathname.startsWith('/mock-fidelity')
+  const isMockImport = window.location.pathname.startsWith('/rooted/mock-fidelity-received')
 
   return (
     <>
@@ -698,13 +843,15 @@ function App() {
               <li><a href="/">Home</a></li>
               <li><a href="/paper-trading">Paper Trade</a></li>
               <li><a href="/forum">Forum</a></li>
+              <li><a href="/mock-fidelity">Mock Fidelity</a></li>
               <li><a href="/login.html">Login</a></li>
             </>
-          ) : isPaperTrading ? (
+          ) : isPaperTrading || isMockFidelity || isMockImport ? (
             <>
               <li><a href="/">Home</a></li>
               <li><a href="/investment-chatbot">AI Assistant</a></li>
               <li><a href="/forum">Forum</a></li>
+              <li><a href="/mock-fidelity">Mock Fidelity</a></li>
               <li><a href="/login.html">Login</a></li>
             </>
           ) : isForum ? (
@@ -712,6 +859,7 @@ function App() {
               <li><a href="/">Home</a></li>
               <li><a href="/paper-trading">Paper Trade</a></li>
               <li><a href="/investment-chatbot">AI Assistant</a></li>
+              <li><a href="/mock-fidelity">Mock Fidelity</a></li>
               <li><a href="/login.html">Login</a></li>
             </>
           ) : (
@@ -721,6 +869,7 @@ function App() {
               <li><a href="/paper-trading">Paper Trade</a></li>
               <li><a href="/investment-chatbot">AI Assistant</a></li>
               <li><a href="/forum">Forum</a></li>
+              <li><a href="/mock-fidelity">Mock Fidelity</a></li>
               <li><a href="/login.html">Login</a></li>
               <li><a href="/onboarding.html">Start</a></li>
             </>
@@ -732,6 +881,10 @@ function App() {
         <InvestmentChatbot />
       ) : isPaperTrading ? (
         <PaperTrading />
+      ) : isMockFidelity ? (
+        <MockFidelity />
+      ) : isMockImport ? (
+        <MockImportPreview />
       ) : isForum ? (
         <Forum />
       ) : (

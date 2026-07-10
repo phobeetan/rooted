@@ -1079,6 +1079,112 @@ footer {
   font-weight: 500;
 }
 
+.mock-page {
+  min-height: calc(100vh - 73px);
+  padding: 4rem 6vw 6rem;
+}
+
+.mock-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.mock-hero h1 {
+  max-width: 16ch;
+  margin: 0.45rem 0 0;
+  font-size: clamp(2.1rem, 4.8vw, 4rem);
+  line-height: 1.04;
+}
+
+.mock-hero p {
+  max-width: 48ch;
+  margin-top: 1rem;
+  color: var(--brown);
+  line-height: 1.65;
+}
+
+.mock-note {
+  padding: 0.9rem 1rem;
+  margin: 1rem 0;
+  color: var(--sage);
+  background: rgba(237, 241, 232, 0.72);
+  border: 1px solid var(--line);
+}
+
+.mock-note.error {
+  color: var(--rose);
+  background: rgba(214, 166, 176, 0.18);
+}
+
+.mock-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin: 1.2rem 0;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.mock-grid div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: var(--cream);
+}
+
+.mock-grid span {
+  color: rgba(85, 64, 47, 0.62);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mock-grid strong {
+  color: var(--brown-deep);
+  font-size: 1.2rem;
+}
+
+.mock-table-wrap,
+.mock-payload {
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: var(--cream);
+}
+
+.mock-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+}
+
+.mock-table th,
+.mock-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--brown);
+  text-align: left;
+}
+
+.mock-table th {
+  color: var(--sage);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mock-payload {
+  max-height: 62vh;
+  padding: 1rem;
+  color: var(--brown);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 860px) {
   nav {
     gap: 1rem;
@@ -1132,6 +1238,10 @@ footer {
   }
 
   .paper-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mock-grid {
     grid-template-columns: 1fr 1fr;
   }
 

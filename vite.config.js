@@ -24,6 +24,7 @@ const mockPortfolioContext = {
 
 let stockCache = null
 let coinbaseCache = null
+let lastMockFidelityImport = null
 
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -233,6 +234,28 @@ function stocksApi(req, res, next) {
     .catch((error) => sendJson(res, 500, { error: error.message || 'Stock data failed.' }))
 }
 
+function mockFidelityApi(req, res, next) {
+  const url = new URL(req.url, 'http://localhost')
+  if (url.pathname !== '/api/mock-fidelity/import') return next()
+
+  if (req.method === 'GET') {
+    if (!lastMockFidelityImport) return sendJson(res, 404, { message: 'No mock Fidelity data received yet.' })
+    return sendJson(res, 200, { data: lastMockFidelityImport })
+  }
+
+  if (req.method !== 'POST') return sendJson(res, 405, { message: 'Use GET or POST.' })
+
+  readJson(req)
+    .then((payload) => {
+      if (payload.provider !== 'mock_fidelity' || !Array.isArray(payload.accounts)) {
+        return sendJson(res, 400, { message: 'Invalid mock Fidelity payload.' })
+      }
+      lastMockFidelityImport = payload
+      return sendJson(res, 200, { message: 'Mock Fidelity data received.' })
+    })
+    .catch(() => sendJson(res, 400, { message: 'Invalid JSON payload.' }))
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -242,10 +265,12 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use(stocksApi)
         server.middlewares.use(investmentChatApi)
+        server.middlewares.use(mockFidelityApi)
       },
       configurePreviewServer(server) {
         server.middlewares.use(stocksApi)
         server.middlewares.use(investmentChatApi)
+        server.middlewares.use(mockFidelityApi)
       },
     },
   ],
