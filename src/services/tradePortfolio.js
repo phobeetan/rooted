@@ -31,19 +31,39 @@ export function buildMockFidelityPortfolio(trade, stocks) {
   return {
     ...mockFidelity,
     accounts: [
-      ...mockFidelity.accounts.map((account) => ({ ...account, cash: 0 })),
+      ...mockFidelity.accounts.map((account) => ({
+        ...account,
+        value: account.value - account.cash,
+        cash: 0,
+        settledCash: 0,
+        cashAvailableToTrade: 0,
+      })),
       {
         type: 'Trade Account',
+        accountNumber: 'Simulation',
         value: accountValue,
         cash: trade.cash,
-        positions: holdings.map((holding) => [
-          holding.symbol,
-          holding.name,
-          'stock',
-          holding.value,
-          accountValue ? (holding.value / accountValue) * 100 : 0,
-        ]),
+        settledCash: trade.cash,
+        cashAvailableToTrade: trade.cash,
+        positions: holdings.map((holding) => ({
+          symbol: holding.symbol,
+          name: holding.name,
+          type: 'stock',
+          value: holding.value,
+          allocation: accountValue ? (holding.value / accountValue) * 100 : 0,
+          shares: holding.quantity,
+          price: holding.price,
+        })),
       },
+    ],
+    recentActivity: [
+      ...trade.orders.map((order) => ({
+        date: order.time,
+        type: order.side,
+        symbol: order.symbol,
+        amount: order.side === 'buy' ? -order.total : order.total,
+      })),
+      ...mockFidelity.recentActivity,
     ],
   }
 }

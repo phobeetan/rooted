@@ -138,19 +138,22 @@ export async function saveInvestments(portfolio) {
   const syncedAt = new Date().toISOString();
   const rows = portfolio.accounts.flatMap((account) =>
     [
-      ...account.positions.map(([symbol, name, assetType, value, allocationPercent, quantity = 0, price = 0]) => ({
-        profile_id: user.id,
-        provider: portfolio.provider,
-        account_type: account.type,
-        symbol,
-        name,
-        asset_type: assetType,
-        value,
-        allocation_percent: allocationPercent,
-        quantity,
-        price,
-        synced_at: syncedAt,
-      })),
+      ...account.positions.map((position) => {
+        const quantity = Number(position.shares ?? position.quantity) || 0;
+        return {
+          profile_id: user.id,
+          provider: portfolio.provider,
+          account_type: account.type,
+          symbol: position.symbol,
+          name: position.name,
+          asset_type: position.type,
+          value: position.value,
+          allocation_percent: position.allocation,
+          quantity,
+          price: Number(position.price) || (quantity ? position.value / quantity : 0),
+          synced_at: syncedAt,
+        };
+      }),
       {
         profile_id: user.id,
         provider: portfolio.provider,
