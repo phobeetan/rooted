@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login - Rooted</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <style>
+      body{background:#f7fafc;margin:0}
+      .wrap{max-width:540px;margin:8vh auto;padding:28px 24px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(10,10,20,.06)}
+      h1{margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+      .form-group{margin-bottom:16px}
+      label{display:block;margin-bottom:6px;font-weight:600}
+      input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
+      #login-error{color:#dc3545;margin-top:8px}
+      .actions{display:flex;gap:8px;margin-top:18px}
+      .btn{padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+      .btn-primary{background:#0b76ff;color:#fff}
+      a{color:#0b76ff}
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Sign in</h1>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" required />
+        </div>
+        <div id="login-error" role="alert"></div>
+        <div class="actions">
+          <button type="submit" id="login-btn" class="btn btn-primary">Sign in</button>
+          <a href="index.html" class="btn">Back</a>
+        </div>
+      </form>
+    </main>
+
+    <script type="module" src="./scripts/viewcontrollers/loginController.js"></script>
+  </body>
+</html>
