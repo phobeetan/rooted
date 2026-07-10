@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { starterPrompts } from '../data/rootedData.js'
+import { getAssistantReply } from '../services/assistantService.js'
+
+const ADVISOR_GREETING = {
+  role: 'assistant',
+  content: 'Hi, I explain investing basics in plain language. I am here for education, not personalized financial advice.',
+}
 
 function InvestmentChatbot() {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Hi, I explain investing basics in plain language. I am here for education, not personalized financial advice.',
-    },
-  ])
+  const [messages, setMessages] = useState([ADVISOR_GREETING])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,14 +24,8 @@ function InvestmentChatbot() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/investment-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: nextMessages.slice(-8) }),
-      })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'The assistant could not respond.')
-      setMessages([...nextMessages, { role: 'assistant', content: data.reply }])
+      const reply = await getAssistantReply(nextMessages.slice(-8))
+      setMessages([...nextMessages, { role: 'assistant', content: reply }])
     } catch (err) {
       setError(err.message || 'Something went wrong.')
       setMessages([...nextMessages, { role: 'assistant', content: 'I had trouble answering that. Please try again.' }])
@@ -76,7 +71,12 @@ function InvestmentChatbot() {
             event.preventDefault()
             sendMessage()
           }}>
-            <input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask an investment question" disabled={loading} />
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="Ask an investment question"
+              disabled={loading}
+            />
             <button className="btn-outline" type="submit" disabled={loading}>Send</button>
           </form>
           {error && <p className="error-text">{error}</p>}

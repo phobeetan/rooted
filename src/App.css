@@ -368,7 +368,7 @@ select {
 
 .text-viewport,
 .growth-stage {
-  height: 230px;
+  height: 300px;
 }
 
 .text-viewport {
@@ -402,6 +402,11 @@ select {
 .growth-stage p {
   max-width: 34rem;
   margin: 0.9rem 0 0;
+}
+
+.growth-cta {
+  width: fit-content;
+  margin-top: 1.4rem;
 }
 
 .growth-right {
@@ -1075,7 +1080,7 @@ select {
 
   .text-viewport,
   .growth-stage {
-    height: 260px;
+    height: 330px;
   }
 
   .metric-grid {

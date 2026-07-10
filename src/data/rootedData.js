@@ -1,28 +1,39 @@
 export const growthStages = [
   {
-    name: 'Root',
-    title: 'Learn where you stand',
-    copy: 'Income, rent, goals, and questions. No jargon, just a starting point built around real numbers.',
+    name: 'Paper Trade',
+    title: 'Paper Trade',
+    copy: 'Invest without spending real money. Practice buying and selling women-led stocks with $10,000 in practice cash.',
+    path: '/paper-trading',
   },
   {
-    name: 'Sprout',
-    title: 'Build your first habit',
-    copy: 'A savings cushion, a budget that fits your life, and the first automated money move.',
+    name: 'Mock Fidelity',
+    title: 'Mock Fidelity',
+    copy: 'See a real brokerage account synced into Rooted, and get comfortable reading real holdings and balances.',
+    path: '/mock-fidelity',
   },
   {
-    name: 'Sapling',
-    title: 'Grow with intention',
-    copy: 'Stocks, funds, and companies aligned with what you care about, including women-led businesses.',
+    name: 'AI Assistant',
+    title: 'AI Assistant',
+    copy: 'Ask questions about your portfolio, startups, and the market, and get answers grounded in your real data.',
+    path: '/investment-chatbot',
   },
   {
-    name: 'Branch',
-    title: 'Back a founder, or become one',
+    name: 'Salary Negotiation',
+    title: 'Salary Negotiation',
+    copy: 'Practice negotiating a real job offer with an AI hiring manager, and get coaching feedback after every reply.',
+    path: '/salary-negotiation',
+  },
+  {
+    name: 'Startups',
+    title: 'Startups',
     copy: 'Discover women-founded startups looking for support, or bring your own idea to the community.',
+    path: '/startups',
   },
   {
-    name: 'Canopy',
-    title: 'Lead the next generation',
-    copy: 'Mentor, invest, and pass down what you learned so more people can build freedom.',
+    name: 'Forum',
+    title: 'Forum',
+    copy: 'Connect with a community of investors further along the path, and share what you have learned.',
+    path: '/forum',
   },
 ]
 
@@ -195,6 +206,24 @@ export const starterPrompts = [
   'How can investing support career independence?',
   'How should I think about saving vs investing?',
 ]
+
+export const mockCareerProfile = {
+  name: 'Demo User',
+  currentRole: 'Marketing Coordinator',
+  currentSalary: 58000,
+  yearsExperience: 2,
+  offer: {
+    company: 'Brightline Analytics',
+    role: 'Senior Marketing Coordinator',
+    hiringManagerName: 'Jordan',
+    baseSalary: 64000,
+    signingBonus: 1500,
+    equity: '0.02% RSUs vesting over 4 years',
+    benefits: '401(k) with 4% match, health/dental/vision, unlimited PTO',
+    startDate: 'in 3 weeks',
+  },
+  marketBenchmark: 71000,
+}
 
 export const mockFidelity = {
   provider: 'mock_fidelity',

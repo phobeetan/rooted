@@ -2,11 +2,12 @@ const links = [
   ['/', 'Home'],
   ['/#growth', 'Journey'],
   ['/#directory', 'Directory'],
-  ['/startups', 'Startups'],
   ['/paper-trading', 'Paper Trade'],
-  ['/investment-chatbot', 'AI Assistant'],
-  ['/forum', 'Forum'],
   ['/mock-fidelity', 'Mock Fidelity'],
+  ['/investment-chatbot', 'AI Assistant'],
+  ['/salary-negotiation', 'Salary Negotiation'],
+  ['/startups', 'Startups'],
+  ['/forum', 'Forum'],
   ['/login.html', 'Login'],
 ]
 
