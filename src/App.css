@@ -30,6 +30,36 @@ a {
   color: inherit;
 }
 
+button,
+a,
+input,
+textarea,
+select,
+.info-card,
+.startup-card,
+.donation-card,
+.postCard,
+.stock-row:not(.header) {
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+button:not(:disabled):active,
+.btn-outline:active,
+.site-nav a:active,
+.info-card:active,
+.startup-card:active,
+.donation-card:active,
+.postCard:active,
+.stock-row:not(.header):active {
+  transform: translateY(1px) scale(0.99);
+}
+
 h1,
 h2,
 h3 {
@@ -110,6 +140,22 @@ select {
   min-height: 100vh;
 }
 
+.page-transition {
+  animation: page-in 0.32s ease both;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .bud-panel {
   position: fixed;
   z-index: 100;
@@ -123,6 +169,17 @@ select {
   background: var(--paper);
   border-left: 1px solid var(--line);
   box-shadow: -18px 0 50px rgba(46, 59, 49, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(100% + 1.5rem));
+  transition: transform 0.28s ease, opacity 0.28s ease;
+  will-change: transform, opacity;
+}
+
+.bud-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
 }
 
 .bud-header {
@@ -357,6 +414,23 @@ select {
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 700;
+  transform: translateY(0) scale(1);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bud-launcher:hover {
+  background: var(--root);
+}
+
+.bud-launcher.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.75rem) scale(0.96);
 }
 
 .bud-launcher .bud-avatar {
@@ -1193,7 +1267,16 @@ select {
   gap: 0.65rem;
   min-height: 210px;
   padding: 1.15rem;
+  color: inherit;
   background: var(--paper);
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.crypto-card.active,
+.crypto-card:hover {
+  background: var(--sage-soft);
 }
 
 .crypto-card h2 {
@@ -1307,19 +1390,22 @@ select {
   border-bottom: 1px solid var(--line);
 }
 
-.startup-list {
+.startup-list,
+.donation-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .startup-card,
+.donation-card,
 .submit-panel {
   background: var(--paper);
   border: 1px solid var(--line);
 }
 
-.startup-card {
+.startup-card,
+.donation-card {
   padding: 1.35rem;
   color: inherit;
   cursor: pointer;
@@ -1328,7 +1414,9 @@ select {
 }
 
 .startup-card:hover,
-.startup-card:focus-visible {
+.startup-card:focus-visible,
+.donation-card:hover,
+.donation-card:focus-visible {
   background: var(--sage-soft);
 }
 
@@ -1341,11 +1429,13 @@ select {
 }
 
 .startup-card h2,
+.donation-card h2,
 .submit-panel h2 {
   font-size: 1.35rem;
 }
 
 .startup-card p,
+.donation-card p,
 .submit-panel p {
   margin: 0.7rem 0 0;
 }
@@ -1503,6 +1593,18 @@ select {
   gap: 1.5rem;
 }
 
+.donation-modal-cols {
+  margin-top: 1.4rem;
+}
+
+.donation-amount {
+  margin-top: 1rem;
+}
+
+.donation-presets {
+  margin: 0.8rem 0 0;
+}
+
 @media (max-width: 860px) {
   :root {
     --nav-height: 116px;
@@ -1545,6 +1647,11 @@ select {
   .crypto-grid,
   .order-summary {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .startup-list,
+  .donation-list {
+    grid-template-columns: 1fr;
   }
 
   .card-grid {

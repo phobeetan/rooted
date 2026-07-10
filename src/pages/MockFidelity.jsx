@@ -8,6 +8,7 @@ const pct = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFr
 
 const ALLOCATION_COLORS = {
   stock: 'var(--sage)',
+  crypto: 'var(--forest)',
   etf: 'var(--root)',
   'mutual fund': 'var(--rose)',
   cash: 'var(--petal)',
@@ -42,7 +43,7 @@ function formatChange(value, percent) {
 function MockFidelity() {
   const trade = readTradeState()
   const portfolio = buildMockFidelityPortfolio(trade, womenLedStocks)
-  const hasLocalTrades = trade.orders.length > 0 || Object.keys(trade.positions).length > 0
+  const hasLocalTrades = trade.orders.length > 0 || trade.donations?.length > 0 || Object.keys(trade.positions).length > 0
   const [savedRows, setSavedRows] = useState([])
 
   const localRows = portfolio.accounts.flatMap((account) => [

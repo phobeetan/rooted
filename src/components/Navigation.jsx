@@ -9,6 +9,7 @@ const links = [
   ['/startups', 'Startups'],
   ['/trade', 'Trade'],
   ['/crypto', 'Crypto'],
+  ['/donations', 'Donations'],
   ['/salary-negotiation', 'Salary Negotiation'],
   ['/forum', 'Forum'],
 ]

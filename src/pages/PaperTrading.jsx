@@ -76,7 +76,7 @@ function PaperTrading() {
   }
 
   function reviewOrder() {
-    if (!active?.price || dollars <= 0) return setError('Enter a trade amount.')
+    if (!active?.price || !Number.isFinite(dollars) || dollars <= 0) return setError('Enter a trade amount.')
     if (side === 'buy' && dollars > trade.cash) return setError('Not enough cash.')
 
     if (side === 'sell' && estimatedShares > activeOwned) return setError('Not enough shares to sell.')
@@ -87,6 +87,7 @@ function PaperTrading() {
       side,
       symbol: active.symbol,
       name: active.name,
+      assetType: 'stock',
       shares: estimatedShares,
       price: active.price,
       total: dollars,
@@ -106,6 +107,7 @@ function PaperTrading() {
     if (nextShares <= 0.000001) delete positions[review.symbol]
 
     const nextTrade = {
+      ...trade,
       cash: trade.cash + (review.side === 'buy' ? -review.total : review.total),
       positions,
       prices: { ...trade.prices, [review.symbol]: review.price },

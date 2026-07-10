@@ -4,7 +4,7 @@ export const TRADE_STORAGE_KEY = 'rooted-trade-portfolio-fidelity'
 export const fidelityCash = mockFidelity.accounts.reduce((sum, account) => sum + account.cash, 0)
 
 export function freshTradeState() {
-  return { cash: fidelityCash, positions: {}, prices: {}, orders: [] }
+  return { cash: fidelityCash, positions: {}, prices: {}, orders: [], donations: [] }
 }
 
 export function readTradeState() {
@@ -17,13 +17,22 @@ export function readTradeState() {
   }
 }
 
-export function buildMockFidelityPortfolio(trade, stocks) {
-  if (!trade?.orders?.length && !Object.keys(trade?.positions || {}).length) return mockFidelity
+export function buildMockFidelityPortfolio(trade, assets = []) {
+  if (!trade?.orders?.length && !trade?.donations?.length && !Object.keys(trade?.positions || {}).length) return mockFidelity
 
+  const assetBySymbol = new Map(assets.map((asset) => [asset.symbol, asset]))
   const holdings = Object.entries(trade.positions).map(([symbol, quantity]) => {
-    const stock = stocks.find((item) => item.symbol === symbol)
-    const price = stock?.price || trade.prices?.[symbol] || trade.orders.find((order) => order.symbol === symbol)?.price || 0
-    return { symbol, quantity, price, name: stock?.name || symbol, value: quantity * price }
+    const asset = assetBySymbol.get(symbol)
+    const order = trade.orders.find((item) => item.symbol === symbol)
+    const price = asset?.price || trade.prices?.[symbol] || order?.price || 0
+    return {
+      symbol,
+      quantity,
+      price,
+      name: asset?.name || order?.name || symbol,
+      type: asset?.type || order?.assetType || 'stock',
+      value: quantity * price,
+    }
   })
   const holdingsValue = holdings.reduce((sum, holding) => sum + holding.value, 0)
   const accountValue = trade.cash + holdingsValue
@@ -48,7 +57,7 @@ export function buildMockFidelityPortfolio(trade, stocks) {
         positions: holdings.map((holding) => ({
           symbol: holding.symbol,
           name: holding.name,
-          type: 'stock',
+          type: holding.type,
           value: holding.value,
           allocation: accountValue ? (holding.value / accountValue) * 100 : 0,
           shares: holding.quantity,
@@ -57,6 +66,12 @@ export function buildMockFidelityPortfolio(trade, stocks) {
       },
     ],
     recentActivity: [
+      ...(trade.donations || []).map((donation) => ({
+        date: donation.time,
+        type: 'donation',
+        symbol: donation.name,
+        amount: -donation.amount,
+      })),
       ...trade.orders.map((order) => ({
         date: order.time,
         type: order.side,

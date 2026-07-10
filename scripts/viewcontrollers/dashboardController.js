@@ -76,10 +76,10 @@ function buildRecommendations(profile = {}, investments = []) {
       },
       {
         type: 'Crypto',
-        title: isLongTerm ? 'Crypto watchlist' : 'Keep crypto small',
+        title: isLongTerm ? 'Crypto practice trade' : 'Keep crypto small',
         body: isLongTerm
-          ? `If crypto fits your risk tolerance, keep it a small slice and start by learning BTC and ETH.`
-          : `For short-term goals, crypto is better as a watchlist than a place for money you may need soon.`,
+          ? `If crypto fits your risk tolerance, keep it a small slice and start by learning BTC and ETH with practice trades.`
+          : `For short-term goals, crypto is better as a learning simulation than a place for money you may need soon.`,
         picks: ['BTC', 'ETH', 'SOL'],
         path: '/crypto',
         prompt: 'Explain beginner crypto risk, BTC vs ETH, and how small crypto allocations are usually sized.',
