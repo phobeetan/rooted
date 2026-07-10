@@ -247,6 +247,84 @@ p {
   color: var(--muted);
 }
 
+.recommendation-summary {
+  max-width: 420px;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.recommendation-card {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-height: 260px;
+  padding: 1.1rem;
+  background: var(--paper);
+}
+
+.recommendation-card .tag,
+.recommendation-picks span {
+  width: fit-content;
+  color: var(--sage);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recommendation-card strong {
+  color: var(--forest);
+  font-family: Fraunces, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.recommendation-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.recommendation-picks,
+.recommendation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.recommendation-picks span {
+  padding: 0.35rem 0.5rem;
+  color: var(--forest);
+  background: var(--sage-soft);
+  border: 1px solid var(--line);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.recommendation-actions {
+  margin-top: auto;
+}
+
+.recommendation-actions a {
+  color: var(--forest);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.recommendation-actions a:hover {
+  color: var(--root);
+}
+
 .news-search {
   display: grid;
   width: min(100%, 620px);
@@ -452,6 +530,10 @@ p {
   }
 
   .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendation-grid {
     grid-template-columns: 1fr;
   }
 }

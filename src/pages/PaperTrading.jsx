@@ -16,7 +16,11 @@ function PaperTrading() {
   const [coinbase, setCoinbase] = useState(null)
   const [trade, setTrade] = useState(readTradeState)
   const [selected, setSelected] = useState(womenLedStocks[0].symbol)
+  const [side, setSide] = useState('buy')
   const [amount, setAmount] = useState('250')
+  const [orderType, setOrderType] = useState('Market')
+  const [duration, setDuration] = useState('Day')
+  const [review, setReview] = useState(null)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -38,7 +42,15 @@ function PaperTrading() {
     localStorage.setItem(TRADE_STORAGE_KEY, JSON.stringify(trade))
   }, [trade])
 
+  useEffect(() => {
+    setReview(null)
+  }, [selected, side, amount, orderType, duration])
+
   const active = stocks.find((stock) => stock.symbol === selected) || stocks[0]
+  const dollars = Number(amount)
+  const activeOwned = trade.positions[active?.symbol] || 0
+  const estimatedShares = active?.price && dollars > 0 ? dollars / active.price : 0
+  const cashAfterOrder = side === 'buy' ? trade.cash - dollars : trade.cash + dollars
   const q = query.toLowerCase()
   const filtered = stocks.filter((stock) => (
     stock.symbol.toLowerCase().includes(q)
@@ -63,35 +75,45 @@ function PaperTrading() {
     }
   }
 
-  async function placeOrder(side) {
-    const dollars = Number(amount)
+  function reviewOrder() {
     if (!active?.price || dollars <= 0) return setError('Enter a trade amount.')
     if (side === 'buy' && dollars > trade.cash) return setError('Not enough cash.')
 
-    const owned = trade.positions[active.symbol] || 0
-    const tradeShares = dollars / active.price
-    if (side === 'sell' && tradeShares > owned) return setError('Not enough shares to sell.')
+    if (side === 'sell' && estimatedShares > activeOwned) return setError('Not enough shares to sell.')
 
-    const nextShares = owned + (side === 'buy' ? tradeShares : -tradeShares)
-    const positions = { ...trade.positions, [active.symbol]: nextShares }
-    if (nextShares <= 0.000001) delete positions[active.symbol]
+    setError('')
+    setReview({
+      id: Date.now(),
+      side,
+      symbol: active.symbol,
+      name: active.name,
+      shares: estimatedShares,
+      price: active.price,
+      total: dollars,
+      orderType,
+      duration,
+      status: 'Filled',
+      time: new Date().toLocaleString(),
+    })
+  }
+
+  async function confirmOrder() {
+    if (!review) return
+
+    const owned = trade.positions[review.symbol] || 0
+    const nextShares = owned + (review.side === 'buy' ? review.shares : -review.shares)
+    const positions = { ...trade.positions, [review.symbol]: nextShares }
+    if (nextShares <= 0.000001) delete positions[review.symbol]
 
     const nextTrade = {
-      cash: trade.cash + (side === 'buy' ? -dollars : dollars),
+      cash: trade.cash + (review.side === 'buy' ? -review.total : review.total),
       positions,
-      prices: { ...trade.prices, [active.symbol]: active.price },
-      orders: [{
-        id: Date.now(),
-        side,
-        symbol: active.symbol,
-        shares: tradeShares,
-        price: active.price,
-        total: dollars,
-        time: new Date().toLocaleString(),
-      }, ...trade.orders].slice(0, 10),
+      prices: { ...trade.prices, [review.symbol]: review.price },
+      orders: [review, ...trade.orders].slice(0, 10),
     }
 
     setTrade(nextTrade)
+    setReview(null)
     setError('')
     await saveToMockFidelity(nextTrade)
   }
@@ -99,6 +121,7 @@ function PaperTrading() {
   async function resetTrade() {
     const nextTrade = freshTradeState()
     setTrade(nextTrade)
+    setReview(null)
     setError('')
     await saveToMockFidelity(nextTrade)
   }
@@ -141,14 +164,55 @@ function PaperTrading() {
               </span>
             </div>
             <label className="field">
-              Amount
+              Action
+              <div className="segmented" role="group" aria-label="Trade action">
+                <button className={side === 'buy' ? 'active' : ''} type="button" onClick={() => setSide('buy')}>Buy</button>
+                <button className={side === 'sell' ? 'active' : ''} type="button" onClick={() => setSide('sell')}>Sell</button>
+              </div>
+            </label>
+            <label className="field">
+              Dollar amount
               <input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" />
             </label>
+            <div className="order-fields">
+              <label className="field">
+                Order type
+                <select value={orderType} onChange={(event) => setOrderType(event.target.value)}>
+                  <option>Market</option>
+                </select>
+              </label>
+              <label className="field">
+                Time in force
+                <select value={duration} onChange={(event) => setDuration(event.target.value)}>
+                  <option>Day</option>
+                </select>
+              </label>
+            </div>
+            <div className="order-summary">
+              <div><span>Estimated shares</span><strong>{estimatedShares ? shares.format(estimatedShares) : '—'}</strong></div>
+              <div><span>Owned shares</span><strong>{shares.format(activeOwned)}</strong></div>
+              <div><span>Cash after order</span><strong>{Number.isFinite(cashAfterOrder) ? usd.format(cashAfterOrder) : '—'}</strong></div>
+            </div>
             <div className="trade-actions">
-              <button type="button" onClick={() => placeOrder('buy')}>Buy</button>
-              <button type="button" onClick={() => placeOrder('sell')}>Sell</button>
+              <button type="button" onClick={reviewOrder}>Review order</button>
             </div>
             {error && <p className="error-text">{error}</p>}
+            {review && (
+              <div className="order-review">
+                <span className="tag">Review order</span>
+                <h3>{review.side.toUpperCase()} {review.symbol}</h3>
+                <div className="order-summary compact">
+                  <div><span>Quantity</span><strong>{shares.format(review.shares)}</strong></div>
+                  <div><span>Estimated price</span><strong>{usd.format(review.price)}</strong></div>
+                  <div><span>Estimated total</span><strong>{usd.format(review.total)}</strong></div>
+                  <div><span>Order</span><strong>{review.orderType} · {review.duration}</strong></div>
+                </div>
+                <div className="trade-actions confirm-actions">
+                  <button type="button" onClick={confirmOrder}>Submit order</button>
+                  <button type="button" onClick={() => setReview(null)}>Edit</button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="panel">
@@ -204,7 +268,7 @@ function PaperTrading() {
                 <div key={order.id}>
                   <span>{order.side.toUpperCase()} {order.symbol}</span>
                   <strong>{usd.format(order.total)}</strong>
-                  <small>{shares.format(order.shares)} @ {usd.format(order.price)} - {order.time}</small>
+                  <small>{order.status || 'Filled'} · {order.orderType || 'Market'} · {shares.format(order.shares)} @ {usd.format(order.price)} - {order.time}</small>
                 </div>
               ))}
             </div>

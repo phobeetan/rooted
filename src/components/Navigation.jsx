@@ -5,10 +5,11 @@ import { onAuthChange } from '../../scripts/services/supabaseService.js'
 const links = [
   ['/', 'Home'],
   ['/#directory', 'Directory'],
-  ['/trade', 'Trade'],
-  ['/mock-fidelity', 'Mock Fidelity'],
-  ['/salary-negotiation', 'Salary Negotiation'],
+  ['/mock-fidelity', 'Mock Fidelity Account'],
   ['/startups', 'Startups'],
+  ['/trade', 'Trade'],
+  ['/crypto', 'Crypto'],
+  ['/salary-negotiation', 'Salary Negotiation'],
   ['/forum', 'Forum'],
 ]
 

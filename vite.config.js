@@ -24,8 +24,18 @@ const mockPortfolioContext = {
 
 let stockCache = null
 let coinbaseCache = null
+let cryptoCache = null
 const marketNewsCache = new Map()
 let lastMockFidelityImport = null
+
+const cryptoAssets = [
+  { symbol: 'BTC', name: 'Bitcoin', pair: 'BTC-USD', lane: 'Large-cap crypto' },
+  { symbol: 'ETH', name: 'Ethereum', pair: 'ETH-USD', lane: 'Smart contracts' },
+  { symbol: 'SOL', name: 'Solana', pair: 'SOL-USD', lane: 'High-throughput chain' },
+  { symbol: 'LINK', name: 'Chainlink', pair: 'LINK-USD', lane: 'Oracle network' },
+  { symbol: 'ADA', name: 'Cardano', pair: 'ADA-USD', lane: 'Proof-of-stake chain' },
+  { symbol: 'DOGE', name: 'Dogecoin', pair: 'DOGE-USD', lane: 'Meme asset' },
+]
 
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -99,14 +109,14 @@ async function coinbaseStatus() {
   if (coinbaseCache && Date.now() - coinbaseCache.time < 120000) return coinbaseCache.value
 
   try {
-    const response = await fetch('https://api.coinbase.com/api/v3/brokerage/market/products?limit=1')
+    const response = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot')
     const data = await response.json()
     coinbaseCache = {
       time: Date.now(),
       value: {
         ok: response.ok,
-        product: data.products?.[0]?.product_id || null,
-        note: 'Coinbase public market API is connected for crypto products; stock quotes use the equities feed.',
+        product: data.data?.base || 'BTC',
+        note: 'Coinbase public spot price API is connected for crypto; stock quotes use the equities feed.',
       },
     }
   } catch (error) {
@@ -117,6 +127,32 @@ async function coinbaseStatus() {
   }
 
   return coinbaseCache.value
+}
+
+async function coinbaseSpot(asset) {
+  const response = await fetch(`https://api.coinbase.com/v2/prices/${asset.pair}/spot`)
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.errors?.[0]?.message || `${asset.symbol} price unavailable.`)
+
+  return {
+    ...asset,
+    price: Number(data.data?.amount) || 0,
+    currency: data.data?.currency || 'USD',
+    asOf: new Date().toISOString(),
+  }
+}
+
+async function cryptoData() {
+  if (cryptoCache && Date.now() - cryptoCache.time < 30000) return cryptoCache.value
+
+  const assets = await Promise.all(cryptoAssets.map((asset) => coinbaseSpot(asset)))
+  const value = {
+    assets,
+    source: 'Coinbase public spot price API',
+    asOf: new Date().toISOString(),
+  }
+  cryptoCache = { time: Date.now(), value }
+  return value
 }
 
 async function stockData() {
@@ -235,6 +271,16 @@ function stocksApi(req, res, next) {
     .catch((error) => sendJson(res, 500, { error: error.message || 'Stock data failed.' }))
 }
 
+function cryptoApi(req, res, next) {
+  const url = new URL(req.url, 'http://localhost')
+  if (url.pathname !== '/api/crypto') return next()
+  if (req.method !== 'GET') return sendJson(res, 405, { error: 'Use GET.' })
+
+  cryptoData()
+    .then((data) => sendJson(res, 200, data))
+    .catch((error) => sendJson(res, 500, { error: error.message || 'Crypto data failed.' }))
+}
+
 function cleanNewsQuery(value) {
   return String(value || '').trim().slice(0, 80)
 }
@@ -327,12 +373,14 @@ export default defineConfig(({ mode }) => {
         name: 'investment-chat-api',
         configureServer(server) {
           server.middlewares.use(stocksApi)
+          server.middlewares.use(cryptoApi)
           server.middlewares.use(investmentChatApi)
           server.middlewares.use(marketNewsApi(marketauxToken))
           server.middlewares.use(mockFidelityApi)
         },
         configurePreviewServer(server) {
           server.middlewares.use(stocksApi)
+          server.middlewares.use(cryptoApi)
           server.middlewares.use(investmentChatApi)
           server.middlewares.use(marketNewsApi(marketauxToken))
           server.middlewares.use(mockFidelityApi)

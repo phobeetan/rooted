@@ -1014,6 +1014,87 @@ select {
   text-transform: uppercase;
 }
 
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  overflow: hidden;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.segmented button {
+  min-height: 42px;
+  color: var(--forest);
+  background: var(--paper);
+  border: 0;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.segmented button.active {
+  color: var(--paper);
+  background: var(--forest);
+}
+
+.order-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.order-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 1rem;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.order-summary.compact {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.order-summary div {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 72px;
+  align-content: center;
+  padding: 0.7rem;
+  background: var(--cream);
+}
+
+.order-summary span {
+  color: var(--sage);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.order-summary strong {
+  color: var(--forest);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.order-review {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: var(--sage-soft);
+  border: 1px solid var(--line);
+}
+
+.order-review h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .trade-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1027,6 +1108,10 @@ select {
   background: var(--forest);
   border: 1px solid var(--forest);
   cursor: pointer;
+}
+
+.trade-actions > button:only-child {
+  grid-column: 1 / -1;
 }
 
 .trade-actions button + button {
@@ -1091,6 +1176,47 @@ select {
 .stock-row.active,
 .stock-row:not(.header):hover {
   background: var(--sage-soft);
+}
+
+.crypto-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 1rem;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.crypto-card {
+  display: grid;
+  align-content: start;
+  gap: 0.65rem;
+  min-height: 210px;
+  padding: 1.15rem;
+  background: var(--paper);
+}
+
+.crypto-card h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.crypto-card h2 span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.crypto-card strong {
+  color: var(--forest);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.crypto-card p {
+  margin: 0;
+  font-size: 0.86rem;
 }
 
 .mock-table {
@@ -1416,6 +1542,11 @@ select {
     grid-template-columns: 1fr 1fr;
   }
 
+  .crypto-grid,
+  .order-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1449,6 +1580,13 @@ select {
   }
 
   .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crypto-grid,
+  .order-fields,
+  .order-summary,
+  .order-summary.compact {
     grid-template-columns: 1fr;
   }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Navigation from './components/Navigation.jsx'
+import Crypto from './pages/Crypto.jsx'
 import Forum from './pages/Forum.jsx'
 import Home from './pages/Home.jsx'
 import InvestmentChatbot from './pages/InvestmentChatbot.jsx'
@@ -13,6 +14,11 @@ import './App.css'
 
 function App() {
   const [isBudOpen, setIsBudOpen] = useState(() => window.location.pathname === '/investment-chatbot')
+  const [initialBudPrompt] = useState(() => (
+    window.location.pathname === '/investment-chatbot'
+      ? new URLSearchParams(window.location.search).get('prompt') || ''
+      : ''
+  ))
 
   return (
     <div className="app-shell">
@@ -25,6 +31,7 @@ function App() {
           <Route path="/salary-negotiation" element={<SalaryNegotiation />} />
           <Route path="/startups" element={<Startups />} />
           <Route path="/trade" element={<PaperTrading />} />
+          <Route path="/crypto" element={<Crypto />} />
           <Route path="/paper-trading" element={<Navigate replace to="/trade" />} />
           <Route path="/mock-fidelity" element={<MockFidelity />} />
           <Route path="/rooted/mock-fidelity-received" element={<MockImportPreview />} />
@@ -33,6 +40,7 @@ function App() {
       </div>
       <InvestmentChatbot
         isOpen={isBudOpen}
+        initialPrompt={initialBudPrompt}
         onClose={() => setIsBudOpen(false)}
         onOpen={() => setIsBudOpen(true)}
       />

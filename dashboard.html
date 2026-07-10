@@ -13,10 +13,12 @@
     <ul aria-label="Main navigation">
       <li><a href="/">Home</a></li>
       <li><a href="/#directory">Directory</a></li>
+      <li><a href="/mock-fidelity">Mock Fidelity Account</a></li>
       <li><a href="/startups">Startups</a></li>
       <li><a href="/trade">Trade</a></li>
+      <li><a href="/crypto">Crypto</a></li>
+      <li><a href="/salary-negotiation">Salary Negotiation</a></li>
       <li><a href="/forum">Forum</a></li>
-      <li><a href="/mock-fidelity">Mock Fidelity</a></li>
       <li><button class="nav-button" id="signout-btn" type="button">Sign out</button></li>
     </ul>
   </nav>
@@ -25,7 +27,7 @@
 
     <section class="dashboard-head">
       <p>Profile</p>
-      <h1 id="dashboard-title">Your dashboard</h1>
+      <h1 id="dashboard-title">Your Dashboard</h1>
       <span id="dashboard-email"></span>
     </section>
 
@@ -37,6 +39,17 @@
       <div><span>Savings rate</span><strong id="savings-rate">0%</strong></div>
     </section>
 
+    <section class="dashboard-section" aria-label="Your recommendations">
+      <div class="section-head">
+        <div>
+          <p class="label">Personalized</p>
+          <h2>Your recommendations</h2>
+        </div>
+        <p class="recommendation-summary" id="recommendation-summary"></p>
+      </div>
+      <div class="recommendation-grid" id="recommendation-list"></div>
+    </section>
+
     <section class="dashboard-section" aria-label="App features">
       <div class="section-head">
         <div>
@@ -45,10 +58,12 @@
         </div>
       </div>
       <div class="feature-grid">
-        <a href="/trade"><span class="feature-icon" aria-hidden="true">↗</span><strong>Trade</strong></a>
-        <a href="/investment-chatbot"><span class="feature-icon" aria-hidden="true">✦</span><strong>Bud</strong><small>Ask investing questions</small></a>
-        <a href="/startups"><span class="feature-icon" aria-hidden="true">🚀</span><strong>Startups</strong><small>Explore women-led companies</small></a>
-        <a href="/forum"><span class="feature-icon" aria-hidden="true">💬</span><strong>Forum</strong><small>Join the community</small></a>
+        <a href="/mock-fidelity"><span class="feature-icon" aria-hidden="true">◇</span><strong>Mock Fidelity Account</strong><small>Read linked holdings</small></a>
+        <a href="/startups"><span class="feature-icon" aria-hidden="true">↑</span><strong>Startups</strong><small>Explore women-led companies</small></a>
+        <a href="/trade"><span class="feature-icon" aria-hidden="true">↗</span><strong>Trade</strong><small>Practice stock orders</small></a>
+        <a href="/crypto"><span class="feature-icon" aria-hidden="true">₿</span><strong>Crypto</strong><small>Coinbase price watchlist</small></a>
+        <a href="/salary-negotiation"><span class="feature-icon" aria-hidden="true">$</span><strong>Salary negotiation</strong><small>Practice the conversation</small></a>
+        <a href="/forum"><span class="feature-icon" aria-hidden="true">#</span><strong>Forum</strong><small>Join the community</small></a>
       </div>
     </section>
 

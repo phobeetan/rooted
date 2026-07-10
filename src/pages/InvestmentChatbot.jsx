@@ -7,16 +7,23 @@ const ADVISOR_GREETING = {
   content: 'Hi, I\'m Bud. I can explain investing basics and help you understand your Rooted portfolio in plain language.',
 }
 
-function InvestmentChatbot({ isOpen, onClose, onOpen }) {
+function InvestmentChatbot({ isOpen, initialPrompt = '', onClose, onOpen }) {
   const [messages, setMessages] = useState([ADVISOR_GREETING])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const messageList = useRef(null)
+  const sentInitialPrompt = useRef(false)
 
   useEffect(() => {
     messageList.current?.scrollTo({ top: messageList.current.scrollHeight })
   }, [isOpen, messages, loading])
+
+  useEffect(() => {
+    if (!isOpen || !initialPrompt || sentInitialPrompt.current) return
+    sentInitialPrompt.current = true
+    sendMessage(initialPrompt)
+  }, [isOpen, initialPrompt])
 
   async function sendMessage(text = input) {
     const content = text.trim()

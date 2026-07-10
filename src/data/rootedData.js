@@ -1,33 +1,33 @@
 export const growthStages = [
   {
-    name: 'Trade',
-    title: 'Trade',
-    copy: 'Explore women-led companies connected to your mock Fidelity view.',
-    path: '/trade',
-  },
-  {
-    name: 'Mock Fidelity',
-    title: 'Mock Fidelity',
+    name: 'Mock Fidelity Account',
+    title: 'Mock Fidelity Account',
     copy: 'See a real brokerage account synced into Rooted, and get comfortable reading real holdings and balances.',
     path: '/mock-fidelity',
-  },
-  {
-    name: 'Bud',
-    title: 'Meet Bud',
-    copy: 'Ask Bud about your portfolio, startups, and the market, and get answers grounded in your real data.',
-    path: '/investment-chatbot',
-  },
-  {
-    name: 'Salary Negotiation',
-    title: 'Salary Negotiation',
-    copy: 'Practice negotiating a real job offer with an AI hiring manager, and get coaching feedback after every reply.',
-    path: '/salary-negotiation',
   },
   {
     name: 'Startups',
     title: 'Startups',
     copy: 'Discover women-founded startups looking for support, or bring your own idea to the community.',
     path: '/startups',
+  },
+  {
+    name: 'Trade',
+    title: 'Trade',
+    copy: 'Explore women-led companies connected to your mock Fidelity view.',
+    path: '/trade',
+  },
+  {
+    name: 'Crypto',
+    title: 'Crypto',
+    copy: 'Track crypto prices from Coinbase and learn how crypto risk fits into a broader plan.',
+    path: '/crypto',
+  },
+  {
+    name: 'Salary Negotiation',
+    title: 'Salary Negotiation',
+    copy: 'Practice negotiating a real job offer with an AI hiring manager, and get coaching feedback after every reply.',
+    path: '/salary-negotiation',
   },
   {
     name: 'Forum',
