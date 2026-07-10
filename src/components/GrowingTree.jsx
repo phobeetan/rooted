@@ -27,7 +27,7 @@ function GrowingTree() {
       const rect = wrap.getBoundingClientRect()
       const total = rect.height - window.innerHeight
       const progress = Math.max(0, Math.min(1, -rect.top / total))
-      const stageHeight = window.matchMedia('(max-width: 860px)').matches ? 260 : 230
+      const stageHeight = window.matchMedia('(max-width: 860px)').matches ? 330 : 300
 
       track.style.transform = `translateY(${-progress * (growthStages.length - 1) * stageHeight}px)`
       setActive(Math.min(growthStages.length - 1, Math.round(progress * (growthStages.length - 1))))
@@ -73,6 +73,7 @@ function GrowingTree() {
                 <div className={`growth-stage ${active === index ? 'active' : ''}`} key={stage.name}>
                   <h2>{stage.title}</h2>
                   <p>{stage.copy}</p>
+                  <a className="btn-outline growth-cta" href={stage.path}>Go to {stage.title}</a>
                 </div>
               ))}
             </div>

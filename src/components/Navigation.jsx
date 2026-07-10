@@ -5,11 +5,12 @@ const links = [
   ['/', 'Home'],
   ['/#growth', 'Journey'],
   ['/#directory', 'Directory'],
-  ['/startups', 'Startups'],
-  ['/trade', 'Trade'],
-  ['/investment-chatbot', 'AI Assistant'],
-  ['/forum', 'Forum'],
+  ['/paper-trading', 'Paper Trade'],
   ['/mock-fidelity', 'Mock Fidelity'],
+  ['/investment-chatbot', 'AI Assistant'],
+  ['/salary-negotiation', 'Salary Negotiation'],
+  ['/startups', 'Startups'],
+  ['/forum', 'Forum'],
 ]
 
 function Navigation() {

@@ -6,6 +6,7 @@ import InvestmentChatbot from './pages/InvestmentChatbot.jsx'
 import MockFidelity from './pages/MockFidelity.jsx'
 import MockImportPreview from './pages/MockImportPreview.jsx'
 import PaperTrading from './pages/PaperTrading.jsx'
+import SalaryNegotiation from './pages/SalaryNegotiation.jsx'
 import Startups from './pages/Startups.jsx'
 import './App.css'
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/investment-chatbot" element={<InvestmentChatbot />} />
+        <Route path="/salary-negotiation" element={<SalaryNegotiation />} />
         <Route path="/startups" element={<Startups />} />
         <Route path="/trade" element={<PaperTrading />} />
         <Route path="/paper-trading" element={<PaperTrading />} />
