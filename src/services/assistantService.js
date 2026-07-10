@@ -13,13 +13,13 @@ const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
 
 function buildPortfolioSummary() {
   const positions = mockFidelity.accounts.flatMap((account) =>
-    account.positions.map(([symbol, name, type, value, allocation]) => ({
+    account.positions.map((position) => ({
       account: account.type,
-      symbol,
-      name,
-      type,
-      value,
-      allocation,
+      symbol: position.symbol,
+      name: position.name,
+      type: position.type,
+      value: position.value,
+      allocation: position.allocation,
     })),
   )
   const totalValue = mockFidelity.accounts.reduce((sum, a) => sum + a.value, 0)
