@@ -32,6 +32,9 @@ function StatSlide({ stat, active }) {
     <article className="stat-slide" aria-hidden={!active}>
       <p className="label">The numbers</p>
       <strong>{value}{stat.suffix}</strong>
+      <div className="stat-bar" aria-hidden="true">
+        <div style={{ width: `${active ? Math.min(stat.target, 100) : 0}%` }} />
+      </div>
       <p>{stat.label}</p>
       <small>{stat.source}</small>
     </article>

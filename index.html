@@ -2,41 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rooted</title>
-    <style>
-      :root { --accent: #0b76ff; --bg: #f7fafc; --card: #fff; }
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin:0; }
-      .wrap { max-width: 720px; margin: 8vh auto; padding: 32px; background: var(--card); border-radius: 12px; box-shadow: 0 6px 24px rgba(10,10,20,0.06); text-align:center; }
-      h1 { margin: 0 0 8px; font-size: 2.25rem; color: #063042; }
-      p.lead { margin: 0 0 20px; color:#3b5560; }
-      .actions { display:flex; gap:12px; justify-content:center; margin-top:24px; }
-      .btn { padding: 12px 20px; border-radius:8px; border: none; font-weight:600; cursor:pointer; font-size:1rem; }
-      .btn-primary { background: var(--accent); color:white; }
-      .btn-ghost { background:transparent; border:2px solid #e6eefc; color:#063042; }
-      a { text-decoration: none; }
-    </style>
   </head>
   <body>
-    <main class="wrap" role="main">
-      <h1>Rooted</h1>
-      <p class="lead">Personal finance tools to help you grow. Get started by creating an account or logging in.</p>
-
-      <div class="actions">
-        <a href="onboarding.html"><button class="btn btn-primary" id="register">Register</button></a>
-        <a href="login.html"><button class="btn btn-ghost" id="login">Login</button></a>
-      </div>
-    </main>
-
-    <script>
-      // Keyboard activation: Enter on focused button
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.activeElement && document.activeElement.tagName === 'BUTTON') {
-          document.activeElement.click();
-        }
-      });
-      // focus register for quick flow
-      document.getElementById('register')?.focus();
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

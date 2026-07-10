@@ -48,6 +48,27 @@ export const stats = [
     label: 'of U.S. VC deal value went to startups with at least one female founder in 2024.',
     source: 'PitchBook, 2024 US All In Report',
   },
+  {
+    target: 85,
+    decimals: 0,
+    suffix: '%',
+    label: 'of the average hourly earnings of men is what women earn on average.',
+    source: 'Pew Research Center, 2024',
+  },
+  {
+    target: 30,
+    decimals: 0,
+    suffix: '%',
+    label: 'of women feel very confident in their investment decisions, compared to 45% of men.',
+    source: 'National Financial Capability Study, 2025',
+  },
+  {
+    target: 43,
+    decimals: 0,
+    suffix: '%',
+    label: 'of combined retirement savings held by average male and female 401(k) savers is held by women.',
+    source: 'Vanguard 401(k) data via CNBC, 2025',
+  },
 ]
 
 export const startupStages = ['Idea', 'Pre-seed', 'Seed', 'Series A', 'Growth']

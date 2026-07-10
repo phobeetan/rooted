@@ -258,6 +258,18 @@ select {
   font-size: 1rem;
 }
 
+.stat-bar {
+  height: 9px;
+  overflow: hidden;
+  background: rgba(96, 120, 79, 0.16);
+}
+
+.stat-bar div {
+  height: 100%;
+  background: var(--rose);
+  transition: width 0.45s ease;
+}
+
 .stat-slide small {
   color: var(--sage);
   font-size: 0.7rem;
@@ -436,6 +448,7 @@ select {
 
 .search-row input,
 .field input,
+.field select,
 .chat-form input {
   width: 100%;
   min-width: 0;
@@ -448,6 +461,7 @@ select {
 
 .search-row input:focus,
 .field input:focus,
+.field select:focus,
 .chat-form input:focus {
   border-color: var(--sage);
 }
@@ -834,6 +848,90 @@ select {
   color: var(--forest);
   background: var(--paper);
   border: 1px solid var(--line);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  margin-bottom: 1.25rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.startup-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.startup-card,
+.submit-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.startup-card {
+  padding: 1.35rem;
+}
+
+.startup-card-head,
+.submit-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.startup-card h2,
+.submit-panel h2 {
+  font-size: 1.35rem;
+}
+
+.startup-card p,
+.submit-panel p {
+  margin: 0.7rem 0 0;
+}
+
+.startup-card-head span,
+.startup-tags span {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.55rem;
+  color: var(--root);
+  background: rgba(239, 185, 169, 0.28);
+  border: 1px solid rgba(201, 142, 132, 0.22);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.startup-tags {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.startup-tags strong {
+  color: var(--sage);
+}
+
+.startup-tags div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.startup-tags span {
+  color: var(--forest);
+  background: var(--sage-soft);
+  border-color: var(--line);
+}
+
+.submit-panel {
+  align-items: center;
+  padding: 1.35rem;
+  margin-top: 1rem;
 }
 
 .modal-backdrop {
