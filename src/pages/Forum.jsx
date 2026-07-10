@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import './Forum.css'
+import '../Forum.css'
 
 const categories = ['Investing', 'Budgeting', 'Retirement', 'Real Estate', 'Career & Income', 'Family Finances']
 
