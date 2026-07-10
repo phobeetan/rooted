@@ -3,8 +3,6 @@ import { getInvestments, onAuthChange, signOutUser, syncUserProfile } from '../s
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-const date = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
-
 function text(id, value) {
   document.getElementById(id).textContent = value;
 }
@@ -98,30 +96,13 @@ function buildRecommendations(profile = {}, investments = []) {
 
 class DashboardController {
   constructor() {
-    this.newsForm = document.getElementById('market-news-form');
-    this.newsInput = document.getElementById('market-news-query');
-    this.newsStatus = document.getElementById('market-news-status');
-    this.newsList = document.getElementById('market-news-list');
     this.recommendationSummary = document.getElementById('recommendation-summary');
     this.recommendationList = document.getElementById('recommendation-list');
-    this.newsTimer = null;
 
     document.getElementById('signout-btn')?.addEventListener('click', async () => {
       await signOutUser();
       window.location.href = '/';
     });
-
-    this.newsForm?.addEventListener('submit', (event) => {
-      event.preventDefault();
-      this.loadNews();
-    });
-
-    this.newsInput?.addEventListener('input', () => {
-      clearTimeout(this.newsTimer);
-      this.newsTimer = setTimeout(() => this.loadNews(), 450);
-    });
-
-    this.loadNews();
 
     onAuthChange(async (user) => {
       if (!user) {
@@ -191,59 +172,6 @@ class DashboardController {
         actions,
       );
       this.recommendationList.append(card);
-    });
-  }
-
-  async loadNews() {
-    if (!this.newsList) return;
-
-    const query = this.newsInput?.value.trim() || '';
-    const params = new URLSearchParams();
-    if (query) params.set('q', query);
-
-    this.newsStatus.textContent = 'Loading market news...';
-
-    try {
-      const response = await fetch(`/api/market-news${params.size ? `?${params}` : ''}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Market news unavailable.');
-
-      this.renderNews(data.articles || []);
-      this.newsStatus.textContent = data.message || (data.articles?.length ? '' : 'No Marketaux stories found.');
-    } catch (error) {
-      this.newsList.replaceChildren();
-      this.newsStatus.textContent = error.message || 'Market news unavailable.';
-    }
-  }
-
-  renderNews(articles) {
-    this.newsList.replaceChildren();
-
-    articles.forEach((article) => {
-      const card = node('a', 'news-card');
-      card.href = article.url;
-      card.target = '_blank';
-      card.rel = 'noreferrer';
-
-      if (article.imageUrl) {
-        const image = node('img');
-        image.src = article.imageUrl;
-        image.alt = '';
-        image.loading = 'lazy';
-        image.addEventListener('error', () => image.remove());
-        card.append(image);
-      }
-
-      const body = node('div', 'news-body');
-      const published = article.publishedAt ? date.format(new Date(article.publishedAt)) : '';
-      const meta = [article.source, article.symbol, published].filter(Boolean).join(' - ');
-      body.append(
-        node('span', 'news-meta', meta),
-        node('strong', '', article.title),
-        node('p', '', article.description || article.snippet || ''),
-      );
-      card.append(body);
-      this.newsList.append(card);
     });
   }
 }

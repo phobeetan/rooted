@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { womenLedStocks } from '../womenLedStocks.js'
 import { saveInvestments } from '../../scripts/services/supabaseService.js'
 import {
@@ -10,6 +10,12 @@ import {
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
+const newsDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+
+function formatNewsDate(value) {
+  const time = Date.parse(value)
+  return Number.isFinite(time) ? newsDate.format(time) : ''
+}
 
 function PaperTrading() {
   const [stocks, setStocks] = useState(womenLedStocks.map((stock) => ({ ...stock, price: 0, changePercent: 0 })))
@@ -22,6 +28,11 @@ function PaperTrading() {
   const [duration, setDuration] = useState('Day')
   const [review, setReview] = useState(null)
   const [query, setQuery] = useState('')
+  const [news, setNews] = useState([])
+  const [newsStocks, setNewsStocks] = useState([])
+  const [newsSearch, setNewsSearch] = useState('')
+  const [newsQuery, setNewsQuery] = useState('')
+  const [newsStatus, setNewsStatus] = useState('Loading market news...')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [syncStatus, setSyncStatus] = useState('')
@@ -39,6 +50,31 @@ function PaperTrading() {
   }, [])
 
   useEffect(() => {
+    let ignore = false
+    const params = new URLSearchParams()
+    if (newsQuery) params.set('q', newsQuery)
+
+    setNewsStatus('Loading market news...')
+    fetch(`/api/market-news${params.size ? `?${params}` : ''}`)
+      .then((response) => response.json().then((data) => ({ response, data })))
+      .then(({ response, data }) => {
+        if (!response.ok) throw new Error(data.error || 'Market news unavailable.')
+        if (ignore) return
+        setNews(data.articles || [])
+        setNewsStatus(data.message || (data.articles?.length ? '' : 'No Marketaux stories found.'))
+      })
+      .catch((err) => {
+        if (ignore) return
+        setNews([])
+        setNewsStatus(err.message || 'Market news unavailable.')
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [newsQuery])
+
+  useEffect(() => {
     localStorage.setItem(TRADE_STORAGE_KEY, JSON.stringify(trade))
   }, [trade])
 
@@ -46,7 +82,59 @@ function PaperTrading() {
     setReview(null)
   }, [selected, side, amount, orderType, duration])
 
-  const active = stocks.find((stock) => stock.symbol === selected) || stocks[0]
+  const newsEntities = news
+    .flatMap((article) => article.entities?.length ? article.entities : [{ symbol: article.symbol }])
+    .map((entity) => ({
+      ...entity,
+      symbol: String(entity.symbol || '').toUpperCase(),
+      type: String(entity.type || '').toLowerCase(),
+    }))
+    .filter((entity) => entity.symbol && entity.type !== 'index')
+  const newsSymbols = news
+    .map((article) => String(article.symbol || article.entities?.[0]?.symbol || '').toUpperCase())
+    .filter(Boolean)
+    .filter((symbol, index, symbols) => symbols.indexOf(symbol) === index)
+    .slice(0, 3)
+  const newsSymbolKey = newsSymbols.join(',')
+  const newsNameBySymbol = newsEntities.reduce((names, entity) => {
+    if (entity.name && !names[entity.symbol]) names[entity.symbol] = entity.name
+    return names
+  }, {})
+
+  useEffect(() => {
+    if (!newsSymbolKey) {
+      setNewsStocks([])
+      return
+    }
+
+    let ignore = false
+    const params = new URLSearchParams({ symbols: newsSymbolKey })
+    fetch(`/api/news-stocks?${params}`)
+      .then((response) => response.json().then((data) => ({ response, data })))
+      .then(({ response, data }) => {
+        if (!response.ok) throw new Error(data.error || 'News stock data failed.')
+        if (!ignore) setNewsStocks(data.stocks || [])
+      })
+      .catch(() => {
+        if (!ignore) setNewsStocks([])
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [newsSymbolKey])
+
+  const quotedNewsStocks = newsStocks.map((stock) => ({
+    ...stock,
+    name: newsNameBySymbol[stock.symbol] || stock.name,
+    leader: stock.leader || 'News mention',
+    sector: stock.sector || 'Market news',
+  }))
+  const tradableStocks = [
+    ...quotedNewsStocks,
+    ...stocks.filter((stock) => !quotedNewsStocks.some((item) => item.symbol === stock.symbol)),
+  ]
+  const active = tradableStocks.find((stock) => stock.symbol === selected) || tradableStocks[0]
   const dollars = Number(amount)
   const activeOwned = trade.positions[active?.symbol] || 0
   const estimatedShares = active?.price && dollars > 0 ? dollars / active.price : 0
@@ -59,16 +147,34 @@ function PaperTrading() {
   ))
   const holdings = Object.entries(trade.positions)
     .map(([symbol, count]) => {
-      const stock = stocks.find((item) => item.symbol === symbol)
+      const stock = tradableStocks.find((item) => item.symbol === symbol)
       return stock ? { ...stock, shares: count, value: count * stock.price } : null
     })
     .filter(Boolean)
   const holdingsValue = holdings.reduce((sum, item) => sum + item.value, 0)
   const totalValue = trade.cash + holdingsValue
+  const matchedRelatedStocks = newsSymbols
+    .map((symbol) => quotedNewsStocks.find((stock) => stock.symbol === symbol) || stocks.find((stock) => stock.symbol === symbol))
+    .filter(Boolean)
+    .map((stock) => ({ ...stock, name: newsNameBySymbol[stock.symbol] || stock.name, newsMatched: true }))
+  const matchedSymbols = new Set(matchedRelatedStocks.map((stock) => stock.symbol))
+  const randomNewsStocks = useMemo(() => {
+    const blocked = new Set(newsSymbols)
+    return [...stocks]
+      .filter((stock) => !blocked.has(stock.symbol))
+      .sort(() => Math.random() - 0.5)
+      .map((stock) => ({ ...stock, newsMatched: false }))
+  }, [stocks, newsSymbolKey])
+  const featuredStocks = [
+    ...matchedRelatedStocks,
+    ...randomNewsStocks.filter((stock) => !matchedSymbols.has(stock.symbol)),
+  ].slice(0, 16)
+  const featuredSymbols = new Set(featuredStocks.map((stock) => stock.symbol))
+  const remainingStocks = filtered.filter((stock) => !featuredSymbols.has(stock.symbol))
 
   async function saveToMockFidelity(nextTrade) {
     try {
-      await saveInvestments(buildMockFidelityPortfolio(nextTrade, stocks))
+      await saveInvestments(buildMockFidelityPortfolio(nextTrade, tradableStocks))
       setSyncStatus('Mock Fidelity updated.')
     } catch (err) {
       setSyncStatus(`Saved in this browser. ${err.message || 'Supabase sync failed.'}`)
@@ -126,6 +232,11 @@ function PaperTrading() {
     setReview(null)
     setError('')
     await saveToMockFidelity(nextTrade)
+  }
+
+  function searchNews(event) {
+    event.preventDefault()
+    setNewsQuery(newsSearch.trim())
   }
 
   return (
@@ -235,9 +346,59 @@ function PaperTrading() {
           </div>
         </section>
 
+        <section className="marketaux-section" aria-label="Market news and related stocks">
+          <div className="panel news-stocks-panel">
+            <span className="tag">Marketaux</span>
+            <h2>Stocks in the news</h2>
+            <div className="news-stock-list">
+              {featuredStocks.map((stock, index) => (
+                <button className={`news-stock-row ${stock.symbol === active?.symbol ? 'active' : ''}`} key={stock.symbol} type="button" onClick={() => setSelected(stock.symbol)}>
+                  <span className="news-rank">{index + 1}</span>
+                  <span>
+                    <strong>{stock.symbol}</strong>
+                    <small>{stock.name}</small>
+                  </span>
+                  <span className="news-stock-price">{stock.price ? usd.format(stock.price) : '...'}</span>
+                  <span className={stock.changePercent >= 0 ? 'up' : 'down'}>
+                    {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent || 0}%
+                  </span>
+                  {stock.newsMatched && <em>News match</em>}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel market-news-panel">
+            <div className="rail-head">
+              <span className="tag">Marketaux</span>
+              <h2>Market news</h2>
+            </div>
+            <form className="trade-news-search" onSubmit={searchNews}>
+              <input value={newsSearch} onChange={(event) => setNewsSearch(event.target.value)} type="search" placeholder="Search news" />
+              <button type="submit">Search</button>
+            </form>
+            {newsStatus && <p className="news-status">{newsStatus}</p>}
+            <div className="trade-news-list">
+              {news.map((article) => {
+                const symbols = (article.entities || []).map((entity) => entity.symbol).filter(Boolean).slice(0, 3).join(', ')
+                const meta = [article.source, symbols || article.symbol, formatNewsDate(article.publishedAt)].filter(Boolean).join(' - ')
+
+                return (
+                  <a className="trade-news-card" href={article.url} key={article.url} target="_blank" rel="noreferrer">
+                    {article.imageUrl && <img src={article.imageUrl} alt="" loading="lazy" onError={(event) => event.currentTarget.remove()} />}
+                    <span>{meta}</span>
+                    <strong>{article.title}</strong>
+                    <p>{article.description || article.snippet}</p>
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
         <section className="panel">
           <div className="table-head">
-            <h2>Top 50 women-led stocks</h2>
+            <h2>Remaining stocks</h2>
             <label className="search-row compact">
               <span>Search</span>
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Stock, company, or CEO" />
@@ -247,7 +408,7 @@ function PaperTrading() {
             <div className="stock-row header">
               <span>Symbol</span><span>Company</span><span>Leader</span><span>Price</span><span />
             </div>
-            {filtered.map((stock) => (
+            {remainingStocks.map((stock) => (
               <button className={`stock-row ${stock.symbol === active?.symbol ? 'active' : ''}`} key={stock.symbol} type="button" onClick={() => setSelected(stock.symbol)}>
                 <span>{stock.symbol}</span>
                 <span>{stock.name}</span>
@@ -260,6 +421,7 @@ function PaperTrading() {
             ))}
           </div>
           {loading && <p className="empty">Loading quotes...</p>}
+          {!loading && !remainingStocks.length && <p className="empty">No remaining stocks found.</p>}
         </section>
 
         <section className="panel">

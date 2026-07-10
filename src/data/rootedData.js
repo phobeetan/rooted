@@ -241,15 +241,15 @@ export const startups = [
 ]
 
 export const founders = [
-  { name: 'Priya Anand', tag: 'Biotech', one: 'Ex-Genentech researcher, 2 patents pending in diagnostics.', meta: 'Austin, TX' },
-  { name: 'Dana Okafor', tag: 'Fintech', one: 'Former Stripe engineer building payroll tools for gig workers.', meta: 'Brooklyn, NY' },
-  { name: 'Lucia Reyes', tag: 'Climate', one: 'Environmental engineer turned founder and MIT Climate fellow.', meta: 'Boston, MA' },
-  { name: 'Mei Tanaka', tag: 'Hardware', one: 'Materials scientist with a patent in composite biomaterials.', meta: 'Seattle, WA' },
-  { name: 'Amara Bello', tag: 'AI', one: 'NLP researcher, previously at a Series B applied-AI startup.', meta: 'San Francisco, CA' },
-  { name: 'Ines Duarte', tag: 'Consumer', one: 'Second-time founder who exited a DTC brand in 2023.', meta: 'Chicago, IL' },
-  { name: 'Leila Hassan', tag: 'Education', one: 'Former bilingual teacher building adaptive learning tools for multilingual students.', meta: 'Denver, CO' },
-  { name: 'Zara Mitchell', tag: 'Health', one: 'Community health strategist focused on better postpartum care access.', meta: 'Atlanta, GA' },
-  { name: 'Anika Desai', tag: 'Hardware', one: 'Mechanical engineer designing repairable technology for small farms.', meta: 'Madison, WI' },
+  { name: 'Priya Anand', tag: 'Biotech', one: 'Ex-Genentech researcher, 2 patents pending in diagnostics.', meta: 'Austin, TX', email: 'priya@rooted.test', linkedin: 'https://linkedin.com/in/priya-anand' },
+  { name: 'Dana Okafor', tag: 'Fintech', one: 'Former Stripe engineer building payroll tools for gig workers.', meta: 'Brooklyn, NY', email: 'dana@rooted.test', linkedin: 'https://linkedin.com/in/dana-okafor' },
+  { name: 'Lucia Reyes', tag: 'Climate', one: 'Environmental engineer turned founder and MIT Climate fellow.', meta: 'Boston, MA', email: 'lucia@rooted.test', linkedin: 'https://linkedin.com/in/lucia-reyes' },
+  { name: 'Mei Tanaka', tag: 'Hardware', one: 'Materials scientist with a patent in composite biomaterials.', meta: 'Seattle, WA', email: 'mei@rooted.test', linkedin: 'https://linkedin.com/in/mei-tanaka' },
+  { name: 'Amara Bello', tag: 'AI', one: 'NLP researcher, previously at a Series B applied-AI startup.', meta: 'San Francisco, CA', email: 'amara@rooted.test', linkedin: 'https://linkedin.com/in/amara-bello' },
+  { name: 'Ines Duarte', tag: 'Consumer', one: 'Second-time founder who exited a DTC brand in 2023.', meta: 'Chicago, IL', email: 'ines@rooted.test', linkedin: 'https://linkedin.com/in/ines-duarte' },
+  { name: 'Leila Hassan', tag: 'Education', one: 'Former bilingual teacher building adaptive learning tools for multilingual students.', meta: 'Denver, CO', email: 'leila@rooted.test', linkedin: 'https://linkedin.com/in/leila-hassan' },
+  { name: 'Zara Mitchell', tag: 'Health', one: 'Community health strategist focused on better postpartum care access.', meta: 'Atlanta, GA', email: 'zara@rooted.test', linkedin: 'https://linkedin.com/in/zara-mitchell' },
+  { name: 'Anika Desai', tag: 'Hardware', one: 'Mechanical engineer designing repairable technology for small farms.', meta: 'Madison, WI', email: 'anika@rooted.test', linkedin: 'https://linkedin.com/in/anika-desai' },
 ]
 
 export const starterPrompts = [

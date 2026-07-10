@@ -26,6 +26,7 @@ let stockCache = null
 let coinbaseCache = null
 let cryptoCache = null
 const marketNewsCache = new Map()
+const newsStockCache = new Map()
 let lastMockFidelityImport = null
 
 const cryptoAssets = [
@@ -79,6 +80,30 @@ function fallbackQuote(stock) {
     asOf: new Date().toISOString(),
     source: 'fallback',
   }
+}
+
+function cleanSymbol(value) {
+  const raw = String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/^\$/, '')
+  return raw
+    .split(':')
+    .pop()
+    .split('.')[0]
+    .replace(/[^A-Z]/g, '')
+    .slice(0, 5)
+}
+
+function symbolsFromText(value) {
+  const symbols = []
+  const text = String(value || '').toUpperCase()
+  const pattern = /\(([A-Z]{1,5})\)|\b(?:NASDAQ|NYSE|AMEX):\s*([A-Z]{1,5})\b|\$([A-Z]{1,5})\b/g
+  for (const match of text.matchAll(pattern)) {
+    const symbol = cleanSymbol(match[1] || match[2] || match[3])
+    if (symbol && !symbols.includes(symbol)) symbols.push(symbol)
+  }
+  return symbols
 }
 
 async function nasdaqQuote(stock) {
@@ -286,7 +311,26 @@ function cleanNewsQuery(value) {
 }
 
 function newsArticle(item) {
-  const entity = item.entities?.[0] || {}
+  const apiEntities = (item.entities || [])
+    .map((entity) => ({
+      symbol: cleanSymbol(entity.symbol),
+      name: entity.name || '',
+      type: entity.type || '',
+      exchange: entity.exchange || '',
+    }))
+    .filter((entity) => entity.symbol)
+    .slice(0, 6)
+  const articleText = `${item.title || ''} ${item.description || ''} ${item.snippet || ''}`
+  const textEntities = symbolsFromText(articleText).map((symbol) => ({
+    symbol,
+    name: apiEntities.find((entity) => entity.symbol === symbol)?.name || '',
+    type: 'equity',
+    exchange: '',
+  }))
+  const entities = [...textEntities, ...apiEntities]
+    .filter((entity, index, all) => all.findIndex((item) => item.symbol === entity.symbol) === index)
+    .slice(0, 6)
+
   return {
     title: item.title || '',
     description: item.description || item.snippet || '',
@@ -295,8 +339,46 @@ function newsArticle(item) {
     imageUrl: item.image_url || '',
     source: item.source || '',
     publishedAt: item.published_at || '',
-    symbol: entity.symbol || '',
+    symbol: entities.find((entity) => String(entity.type || '').toLowerCase() !== 'index')?.symbol || entities[0]?.symbol || '',
+    entities,
   }
+}
+
+function cleanSymbols(value) {
+  return String(value || '')
+    .split(',')
+    .map(cleanSymbol)
+    .filter(Boolean)
+    .filter((symbol, index, symbols) => symbols.indexOf(symbol) === index)
+    .slice(0, 6)
+}
+
+async function newsStocks(symbols) {
+  const key = symbols.join(',')
+  const cached = newsStockCache.get(key)
+  if (cached && Date.now() - cached.time < 60000) return cached.value
+
+  const stocks = await Promise.all(symbols.map((symbol) => {
+    const known = womenLedStocks.find((stock) => stock.symbol === symbol)
+    const stock = known || { symbol, name: symbol, leader: 'News mention', sector: 'Market news' }
+    return nasdaqQuote(stock).catch(() => fallbackQuote(stock))
+  }))
+  const value = { stocks }
+  newsStockCache.set(key, { time: Date.now(), value })
+  return value
+}
+
+function newsStocksApi(req, res, next) {
+  const url = new URL(req.url, 'http://localhost')
+  if (url.pathname !== '/api/news-stocks') return next()
+  if (req.method !== 'GET') return sendJson(res, 405, { error: 'Use GET.' })
+
+  const symbols = cleanSymbols(url.searchParams.get('symbols'))
+  if (!symbols.length) return sendJson(res, 200, { stocks: [] })
+
+  newsStocks(symbols)
+    .then((data) => sendJson(res, 200, data))
+    .catch((error) => sendJson(res, 500, { error: error.message || 'News stock data failed.' }))
 }
 
 async function marketauxNews(query, token) {
@@ -376,6 +458,7 @@ export default defineConfig(({ mode }) => {
           server.middlewares.use(cryptoApi)
           server.middlewares.use(investmentChatApi)
           server.middlewares.use(marketNewsApi(marketauxToken))
+          server.middlewares.use(newsStocksApi)
           server.middlewares.use(mockFidelityApi)
         },
         configurePreviewServer(server) {
@@ -383,6 +466,7 @@ export default defineConfig(({ mode }) => {
           server.middlewares.use(cryptoApi)
           server.middlewares.use(investmentChatApi)
           server.middlewares.use(marketNewsApi(marketauxToken))
+          server.middlewares.use(newsStocksApi)
           server.middlewares.use(mockFidelityApi)
         },
       },

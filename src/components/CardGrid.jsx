@@ -8,6 +8,16 @@ function CardGrid({ items, onSelect }) {
             <h3>{item.name}</h3>
             <p>{item.one}</p>
             <div className="meta">{item.meta}</div>
+            {(item.email || item.linkedin) && (
+              <div className="contact-row">
+                {item.email && <a href={`mailto:${item.email}`}>{item.email}</a>}
+                {item.linkedin && (
+                  <a className="linkedin-icon" href={item.linkedin} aria-label={`${item.name} LinkedIn`}>
+                    in
+                  </a>
+                )}
+              </div>
+            )}
           </>
         )
 
