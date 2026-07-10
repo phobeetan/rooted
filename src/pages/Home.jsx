@@ -7,6 +7,7 @@ const stats = [
     decimals: 0,
     suffix: '%',
     label: 'of all U.S. VC funding in 2024 went to startups with all-women founding teams — down from 2% in 2023.',
+    caption: '1% women-only teams — 99% teams with a man',
     source: 'PitchBook, 2024 US All In Report',
   },
   {
@@ -14,6 +15,7 @@ const stats = [
     decimals: 0,
     suffix: '%',
     label: "of Y Combinator's Summer 2022 batch had a woman founder.",
+    caption: '15% had a woman founder — 85% did not',
     source: 'Y Combinator / TechCrunch, 2022',
   },
   {
@@ -21,7 +23,32 @@ const stats = [
     decimals: 1,
     suffix: '%',
     label: 'of total U.S. VC deal value went to startups with at least one female founder in 2024, down from 20.8% in 2023.',
+    caption: '19.9% female-founded — 80.1% all-male teams',
     source: 'PitchBook, 2024 US All In Report',
+  },
+  {
+    target: 85,
+    decimals: 0,
+    suffix: '%',
+    label: "Women earn 85% of what men earn per hour on average — a gap that's barely moved in over a decade.",
+    caption: '85¢ per male $1 — 15¢ gap',
+    source: 'Pew Research Center, 2024',
+  },
+  {
+    target: 30,
+    decimals: 0,
+    suffix: '%',
+    label: 'of women feel very confident in their investment decisions, compared to 45% of men.',
+    caption: '30% confident — 70% not',
+    source: 'National Financial Capability Study, 2025',
+  },
+  {
+    target: 43,
+    decimals: 0,
+    suffix: '%',
+    label: 'Of the combined retirement savings held by average male and female 401(k) savers, women hold just 43% — despite saving at similar or better rates.',
+    caption: '43% held by women — 57% by men',
+    source: 'Vanguard 401(k) data via CNBC, 2025',
   },
 ]
 
@@ -93,6 +120,13 @@ function StatSlide({ stat, active }) {
         {displayValue}
         {stat.suffix}
       </p>
+      <div className="slideBar" role="img" aria-label={stat.caption}>
+        <div
+          className="slideBarFill"
+          style={{ width: `${active ? displayValue : 0}%` }}
+        />
+      </div>
+      <p className="slideBarCaption">{stat.caption}</p>
       <p className="slideStatLabel">{stat.label}</p>
       <p className="slideSource">{stat.source}</p>
     </article>

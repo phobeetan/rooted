@@ -85,14 +85,6 @@
   background: #f4fbfa;
 }
 
-.slideAction {
-  background: #ffffff;
-}
-
-.slideSpotlight {
-  background: #fdf6f0;
-}
-
 .slideEyebrow {
   margin: 0;
   color: #0f766e;
@@ -110,6 +102,28 @@
   line-height: 1;
 }
 
+.slideBar {
+  width: 100%;
+  max-width: 320px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e4e7ec;
+  overflow: hidden;
+}
+
+.slideBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: #0f766e;
+}
+
+.slideBarCaption {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .slideStatLabel {
   margin: 0;
   max-width: 520px;
@@ -123,41 +137,6 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-}
-
-.slideActionText,
-.slideSpotlightText {
-  margin: 0;
-  max-width: 560px;
-  color: #101828;
-  font-size: 22px;
-  line-height: 1.4;
-}
-
-.slideButton {
-  align-self: flex-start;
-  padding: 12px 22px;
-  border: none;
-  border-radius: 999px;
-  background: #0f766e;
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.slideButton:hover {
-  background: #0b5c56;
-}
-
-.slideButtonOutline {
-  background: transparent;
-  border: 2px solid #0f766e;
-  color: #0f766e;
-}
-
-.slideButtonOutline:hover {
-  background: #d9f4f0;
 }
 
 .carouselControls {
@@ -219,43 +198,6 @@
 .carouselPause:hover {
   background: #f2f4f7;
   color: #101828;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  padding-top: 36px;
-}
-
-.statCard {
-  padding: 24px 20px;
-  border: 1px solid #d8dee5;
-  border-radius: 8px;
-  background: #ffffff;
-}
-
-.statValue {
-  margin: 0 0 8px;
-  color: #0f766e;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.statLabel {
-  margin: 0 0 12px;
-  color: #101828;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-.statSource {
-  margin: 0;
-  color: #98a2b3;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 
 .features {
