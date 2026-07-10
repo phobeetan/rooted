@@ -16,33 +16,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/**
- * Create a new Firebase account
- * @param {string} email
- * @param {string} password
- * @returns {Promise<string>} uid
- */
 export async function createAccount(email, password) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   return userCredential.user.uid;
 }
 
-/**
- * Save user profile to Firestore under users collection
- * @param {string} uid
- * @param {Object} profileData
- * @returns {Promise<void>}
- */
 export async function saveUserProfile(uid, profileData) {
   const userRef = doc(db, 'users', uid);
   await setDoc(userRef, profileData, { merge: true });
 }
 
-/**
- * Check whether an email exists in users collection
- * @param {string} email
- * @returns {Promise<boolean>}
- */
 export async function checkEmailExists(email) {
   const usersCol = collection(db, 'users');
   const q = query(usersCol, where('email', '==', email), limit(1));
@@ -50,12 +33,6 @@ export async function checkEmailExists(email) {
   return !snapshot.empty;
 }
 
-/**
- * Sign in an existing user with email and password
- * @param {string} email
- * @param {string} password
- * @returns {Promise<string>} uid
- */
 export async function signIn(email, password) {
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   return userCredential.user.uid;
