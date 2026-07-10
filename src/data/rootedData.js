@@ -1,9 +1,9 @@
 export const growthStages = [
   {
-    name: 'Paper Trade',
-    title: 'Paper Trade',
-    copy: 'Invest without spending real money. Practice buying and selling women-led stocks with $10,000 in practice cash.',
-    path: '/paper-trading',
+    name: 'Trade',
+    title: 'Trade',
+    copy: 'Practice buying and selling women-led stocks using cash from your mock Fidelity account. No real orders are placed.',
+    path: '/trade',
   },
   {
     name: 'Mock Fidelity',

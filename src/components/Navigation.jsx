@@ -5,7 +5,7 @@ const links = [
   ['/', 'Home'],
   ['/#growth', 'Journey'],
   ['/#directory', 'Directory'],
-  ['/paper-trading', 'Paper Trade'],
+  ['/trade', 'Trade'],
   ['/mock-fidelity', 'Mock Fidelity'],
   ['/investment-chatbot', 'AI Assistant'],
   ['/salary-negotiation', 'Salary Negotiation'],

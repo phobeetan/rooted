@@ -7,8 +7,8 @@ const sessionKey = 'rooted-demo-user';
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 function fail(error) {
-  if (error?.message?.includes("Could not find the table 'public.profiles'")) {
-    throw new Error('Create the public.profiles table in Supabase first. Run supabase/schema.sql in the SQL Editor.');
+  if (error?.message?.includes('Could not find the table')) {
+    throw new Error('Run supabase/schema.sql in the Supabase SQL Editor first.');
   }
   throw error;
 }
@@ -115,7 +115,7 @@ export async function getUserProfile(user) {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, email, name, birthday, occupation, salary, monthly_spending, goals, financial_knowledge, created_at, last_login_at')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -129,4 +129,77 @@ export async function getUserProfile(user) {
 
 export async function syncUserProfile(user) {
   return getUserProfile(user);
+}
+
+export async function saveInvestments(portfolio) {
+  const user = currentUser();
+  if (!user?.id) throw new Error('Log in before saving your Mock Fidelity data.');
+
+  const syncedAt = new Date().toISOString();
+  const rows = portfolio.accounts.flatMap((account) =>
+    [
+      ...account.positions.map(([symbol, name, assetType, value, allocationPercent, quantity = 0, price = 0]) => ({
+        profile_id: user.id,
+        provider: portfolio.provider,
+        account_type: account.type,
+        symbol,
+        name,
+        asset_type: assetType,
+        value,
+        allocation_percent: allocationPercent,
+        quantity,
+        price,
+        synced_at: syncedAt,
+      })),
+      {
+        profile_id: user.id,
+        provider: portfolio.provider,
+        account_type: account.type,
+        symbol: 'CASH',
+        name: 'Cash',
+        asset_type: 'cash',
+        value: account.cash,
+        allocation_percent: account.value ? (account.cash / account.value) * 100 : 0,
+        quantity: 0,
+        price: 0,
+        synced_at: syncedAt,
+      },
+    ],
+  );
+
+  const removed = await supabase
+    .from('investments')
+    .delete()
+    .eq('profile_id', user.id)
+    .eq('provider', portfolio.provider);
+  if (removed.error) fail(removed.error);
+
+  const { data, error } = await supabase.from('investments').insert(rows).select();
+  if (error) fail(error);
+  return data;
+}
+
+export async function getInvestments(user = currentUser()) {
+  if (!user?.id) return [];
+
+  const { data, error } = await supabase
+    .from('investments')
+    .select('provider, account_type, symbol, name, asset_type, value, allocation_percent, quantity, price, synced_at')
+    .eq('profile_id', user.id)
+    .order('account_type')
+    .order('value', { ascending: false });
+
+  if (error) fail(error);
+  return data;
+}
+
+export async function getAssistantContext() {
+  const user = currentUser();
+  if (!user?.id) return { profile: null, investments: [] };
+
+  const [profile, investments] = await Promise.all([
+    getUserProfile(user),
+    getInvestments(user),
+  ]);
+  return { profile, investments };
 }

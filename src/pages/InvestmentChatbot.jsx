@@ -40,7 +40,7 @@ function InvestmentChatbot() {
         <div className="page-head">
           <p className="label">Financial education</p>
           <h1>AI Investment Assistant</h1>
-          <p>Ask questions about investing, budgeting, portfolios, and financial confidence.</p>
+          <p>Ask questions using your saved profile and Mock Fidelity investments as context.</p>
         </div>
 
         <div className="prompt-row">

@@ -1,70 +1,82 @@
-import { mockCareerProfile, mockFidelity, startups } from '../data/rootedData.js'
+import { mockCareerProfile, startups } from '../data/rootedData.js'
 import { forumPosts } from '../data/forumPosts.js'
 import { womenLedStocks } from '../womenLedStocks.js'
+import { getAssistantContext } from '../../scripts/services/supabaseService.js'
+import { TRADE_STORAGE_KEY } from './tradePortfolio.js'
 
 // Set VITE_GEMINI_API_KEY in a .env.local file (gitignored) to enable real
 // Gemini replies. Without it, getAssistantReply falls back to the rule-based
 // local reply so the demo still works offline or if the call fails.
 const GEMINI_API_KEY = import.meta.env?.VITE_GEMINI_API_KEY
 const GEMINI_MODEL = 'gemini-3.5-flash'
-const PAPER_TRADING_KEY = 'rooted-paper-portfolio'
-
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
-function buildPortfolioSummary() {
-  const positions = mockFidelity.accounts.flatMap((account) =>
-    account.positions.map(([symbol, name, type, value, allocation]) => ({
-      account: account.type,
-      symbol,
-      name,
-      type,
-      value,
-      allocation,
-    })),
-  )
-  const totalValue = mockFidelity.accounts.reduce((sum, a) => sum + a.value, 0)
-  const totalCash = mockFidelity.accounts.reduce((sum, a) => sum + a.cash, 0)
-  const cashPct = (totalCash / (totalValue + totalCash)) * 100
+function buildPortfolioSummary(investments = []) {
+  const rows = investments.map((investment) => ({
+    account: investment.account_type,
+    symbol: investment.symbol,
+    name: investment.name,
+    type: investment.asset_type,
+    value: Number(investment.value) || 0,
+    allocation: Number(investment.allocation_percent) || 0,
+    quantity: Number(investment.quantity) || 0,
+    price: Number(investment.price) || 0,
+  }))
+  const positions = rows.filter((row) => row.type !== 'cash')
+  const totalValue = positions.reduce((sum, position) => sum + position.value, 0)
+  const totalCash = rows.filter((row) => row.type === 'cash').reduce((sum, row) => sum + row.value, 0)
   const topPosition = [...positions].sort((a, b) => b.value - a.value)[0]
 
-  return { positions, totalValue, totalCash, cashPct, topPosition }
+  return { positions, totalValue, totalCash, topPosition }
 }
 
 function readPaperPortfolio() {
   if (typeof localStorage === 'undefined') return null
   try {
-    return JSON.parse(localStorage.getItem(PAPER_TRADING_KEY))
+    return JSON.parse(localStorage.getItem(TRADE_STORAGE_KEY))
   } catch {
     return null
   }
 }
 
-function buildContextBlock() {
-  const { totalValue, totalCash, cashPct, topPosition, positions } = buildPortfolioSummary()
+function buildContextBlock({ profile, investments }) {
+  const { totalValue, totalCash, topPosition, positions } = buildPortfolioSummary(investments)
   const paper = readPaperPortfolio()
+  const salary = Number(profile?.salary) || 0
+  const spending = Number(profile?.monthlySpending) || 0
+  const monthlyIncome = salary / 12
 
   const lines = [
-    `Mock Fidelity brokerage account:`,
-    `- Total invested: ${usd.format(totalValue)}, cash: ${usd.format(totalCash)} (${cashPct.toFixed(1)}% of total).`,
-    `- Largest position: ${topPosition.symbol} (${topPosition.name}) at ${usd.format(topPosition.value)}.`,
-    `- Full holdings: ${positions.map((p) => `${p.symbol} ${p.allocation.toFixed(1)}% (${p.type}, ${p.account})`).join(', ')}.`,
+    `User background from Supabase:`,
+    profile
+      ? `- ${profile.name || 'User'} works as ${profile.occupation || 'an unspecified occupation'}, earns ${usd.format(salary)} annually, and spends ${usd.format(spending)} monthly.`
+      : `- No user is signed in.`,
+    profile ? `- Approximate monthly income after annual salary is divided by 12: ${usd.format(monthlyIncome)}; amount before taxes after reported spending: ${usd.format(monthlyIncome - spending)}.` : '',
+    profile ? `- Main goal: ${profile.goals || 'not provided'}. Financial knowledge: ${profile.financialKnowledge || 'not provided'}.` : '',
+    ``,
+    `Mock Fidelity investments from Supabase:`,
+    positions.length
+      ? `- ${positions.length} saved positions across ${new Set(positions.map((p) => p.account)).size} accounts, with ${usd.format(totalValue)} invested and ${usd.format(totalCash)} in cash.`
+      : `- No investments are saved. Ask the user to log in and open Mock Fidelity; changes sync automatically.`,
+    topPosition ? `- Largest listed position: ${topPosition.symbol} (${topPosition.name}) at ${usd.format(topPosition.value)}.` : '',
+    positions.length ? `- Full holdings: ${positions.map((p) => `${p.symbol} ${p.allocation.toFixed(1)}% (${p.type}, ${p.account}, ${usd.format(p.value)}${p.quantity ? `, ${p.quantity.toFixed(4)} shares at ${usd.format(p.price)}` : ''})`).join(', ')}.` : '',
     ``,
     `Startup investment directory (private, illiquid):`,
     ...startups.map(
       (s) => `- ${s.name} (${s.tag}, ${s.stage}): ${s.one} ${s.meta}. Internal evaluation: ${s.evaluation.verdict} (score ${s.evaluation.score}/10) — upside: ${s.evaluation.upside} Risk: ${s.evaluation.risk}`,
     ),
     ``,
-    `Public women-led stock watchlist available for paper trading (sample): ${womenLedStocks
+    `Public women-led stock watchlist available in Trade (sample): ${womenLedStocks
       .slice(0, 15)
       .map((s) => `${s.symbol} (${s.name}, ${s.sector})`)
       .join(', ')}.`,
   ]
 
-  if (paper && (paper.positions && Object.keys(paper.positions).length)) {
+  if (!investments.length && paper && (paper.positions && Object.keys(paper.positions).length)) {
     const paperHoldings = Object.entries(paper.positions)
       .map(([symbol, shares]) => `${symbol}: ${shares.toFixed(2)} shares`)
       .join(', ')
-    lines.push(``, `User's paper-trading simulation: $${paper.cash.toFixed(2)} cash, holding ${paperHoldings}.`)
+    lines.push(``, `User's Trade simulation: $${paper.cash.toFixed(2)} cash, holding ${paperHoldings}.`)
   }
 
   const topForumThreads = [...forumPosts]
@@ -77,7 +89,7 @@ function buildContextBlock() {
 
   lines.push(``, `Community forum sentiment (top discussions):`, ...topForumThreads)
 
-  return lines.join('\n')
+  return lines.filter((line) => line !== '').join('\n')
 }
 
 const STARTUP_TAG_KEYWORDS = {
@@ -105,18 +117,24 @@ function findMatches(message, keywordMap) {
     .map(([key]) => key)
 }
 
-function getLocalReply(messages) {
+function getLocalReply(messages, context) {
   const lastMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? ''
-  const { totalValue, cashPct, topPosition } = buildPortfolioSummary()
+  const { totalValue, totalCash, topPosition, positions } = buildPortfolioSummary(context.investments)
 
   const matchedTags = findMatches(lastMessage, STARTUP_TAG_KEYWORDS)
   const matchedCategories = findMatches(lastMessage, FORUM_CATEGORY_KEYWORDS)
 
   const parts = []
 
-  parts.push(
-    `Looking at your accounts, you're holding ${usd.format(totalValue)} with ${cashPct.toFixed(1)}% in cash and your biggest position in ${topPosition.symbol}.`,
-  )
+  if (positions.length) {
+    parts.push(`Looking at ${context.profile?.name ? `${context.profile.name}'s` : 'your'} saved Mock Fidelity data, there are ${usd.format(totalValue)} invested, ${usd.format(totalCash)} in cash, and the largest position is ${topPosition.symbol} at ${usd.format(topPosition.value)}.`)
+  } else {
+    parts.push('I do not see saved Mock Fidelity investments yet. Log in and open Mock Fidelity; changes sync automatically.')
+  }
+
+  if (context.profile) {
+    parts.push(`I am also factoring in the goal "${context.profile.goals || 'not provided'}", reported monthly spending of ${usd.format(context.profile.monthlySpending)}, and ${context.profile.financialKnowledge || 'unspecified'} investing knowledge.`)
+  }
 
   const matchingStartups = matchedTags.length
     ? startups.filter((s) => matchedTags.includes(s.tag))
@@ -148,17 +166,17 @@ function getLocalReply(messages) {
   return parts.join(' ')
 }
 
-function buildSystemPrompt() {
-  return `You are Rooted AI, the in-app investment advisor for the Rooted platform. You have full visibility into the user's mock Fidelity brokerage account, the startup investment directory, their paper-trading simulation, and community forum discussions — all provided below as live context.
+function buildSystemPrompt(context) {
+  return `You are Rooted AI, the in-app investment advisor for the Rooted platform. The user's saved profile and Mock Fidelity investments are fetched from Supabase for each message. Other available app context is also provided below.
 
-Act as a knowledgeable, personable investment advisor: reason across all of these sources together (e.g. flag concentration risk in their brokerage holdings, suggest specific startups from the directory that match their interests or fill a gap in their portfolio, reference what the community is saying about similar decisions, and factor in their paper-trading behavior as a signal of risk appetite).
+Act as a knowledgeable, personable investment advisor: reason across all of these sources together (e.g. flag concentration risk in their brokerage holdings, suggest specific startups from the directory that match their interests or fill a gap in their portfolio, reference what the community is saying about similar decisions, and factor in their simulated trading behavior as a signal of risk appetite).
 
 Be specific and cite the actual names, tickers, and numbers from the context rather than speaking generically. Keep responses focused and conversational (a few short paragraphs, not an essay). This is a demo with fictional/mock data, so it's safe to give direct, opinionated suggestions — but close with a brief one-line reminder that this is a hackathon demo, not licensed financial advice.
 
 Respond in plain conversational text only — no markdown formatting (no asterisks, no bold/italic syntax, no headers). If you need a list, write it as short sentences or a simple dash-prefixed line, not markdown bullets.
 
 Context:
-${buildContextBlock()}`
+${buildContextBlock(context)}`
 }
 
 async function callGeminiAPI(messages, systemPrompt) {
@@ -180,11 +198,12 @@ async function callGeminiAPI(messages, systemPrompt) {
 }
 
 export async function getAssistantReply(messages) {
-  if (!GEMINI_API_KEY) return getLocalReply(messages)
+  const context = await getAssistantContext()
+  if (!GEMINI_API_KEY) return getLocalReply(messages, context)
   try {
-    return await callGeminiAPI(messages, buildSystemPrompt())
+    return await callGeminiAPI(messages, buildSystemPrompt(context))
   } catch {
-    return getLocalReply(messages)
+    return getLocalReply(messages, context)
   }
 }
 

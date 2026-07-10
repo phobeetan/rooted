@@ -1,23 +1,15 @@
 import { useEffect, useState } from 'react'
-import { mockFidelity } from '../data/rootedData.js'
 import { womenLedStocks } from '../womenLedStocks.js'
+import { saveInvestments } from '../../scripts/services/supabaseService.js'
+import {
+  buildMockFidelityPortfolio,
+  freshTradeState,
+  readTradeState,
+  TRADE_STORAGE_KEY,
+} from '../services/tradePortfolio.js'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 const shares = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 })
-const tradeKey = 'rooted-trade-portfolio-fidelity'
-const fidelityCash = mockFidelity.accounts.reduce((sum, account) => sum + account.cash, 0)
-
-function freshTradeState() {
-  return { cash: fidelityCash, positions: {}, orders: [] }
-}
-
-function readTradeState() {
-  try {
-    return JSON.parse(localStorage.getItem(tradeKey)) || freshTradeState()
-  } catch {
-    return freshTradeState()
-  }
-}
 
 function PaperTrading() {
   const [stocks, setStocks] = useState(womenLedStocks.map((stock) => ({ ...stock, price: 0, changePercent: 0 })))
@@ -28,6 +20,7 @@ function PaperTrading() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [syncStatus, setSyncStatus] = useState('')
 
   useEffect(() => {
     fetch('/api/stocks')
@@ -42,7 +35,7 @@ function PaperTrading() {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(tradeKey, JSON.stringify(trade))
+    localStorage.setItem(TRADE_STORAGE_KEY, JSON.stringify(trade))
   }, [trade])
 
   const active = stocks.find((stock) => stock.symbol === selected) || stocks[0]
@@ -61,7 +54,16 @@ function PaperTrading() {
   const holdingsValue = holdings.reduce((sum, item) => sum + item.value, 0)
   const totalValue = trade.cash + holdingsValue
 
-  function placeOrder(side) {
+  async function saveToMockFidelity(nextTrade) {
+    try {
+      await saveInvestments(buildMockFidelityPortfolio(nextTrade, stocks))
+      setSyncStatus('Mock Fidelity updated.')
+    } catch (err) {
+      setSyncStatus(`Saved in this browser. ${err.message || 'Supabase sync failed.'}`)
+    }
+  }
+
+  async function placeOrder(side) {
     const dollars = Number(amount)
     if (!active?.price || dollars <= 0) return setError('Enter a trade amount.')
     if (side === 'buy' && dollars > trade.cash) return setError('Not enough cash.')
@@ -70,26 +72,35 @@ function PaperTrading() {
     const tradeShares = dollars / active.price
     if (side === 'sell' && tradeShares > owned) return setError('Not enough shares to sell.')
 
-    setTrade((current) => {
-      const nextShares = (current.positions[active.symbol] || 0) + (side === 'buy' ? tradeShares : -tradeShares)
-      const positions = { ...current.positions, [active.symbol]: nextShares }
-      if (nextShares <= 0.000001) delete positions[active.symbol]
+    const nextShares = owned + (side === 'buy' ? tradeShares : -tradeShares)
+    const positions = { ...trade.positions, [active.symbol]: nextShares }
+    if (nextShares <= 0.000001) delete positions[active.symbol]
 
-      return {
-        cash: current.cash + (side === 'buy' ? -dollars : dollars),
-        positions,
-        orders: [{
-          id: Date.now(),
-          side,
-          symbol: active.symbol,
-          shares: tradeShares,
-          price: active.price,
-          total: dollars,
-          time: new Date().toLocaleString(),
-        }, ...current.orders].slice(0, 10),
-      }
-    })
+    const nextTrade = {
+      cash: trade.cash + (side === 'buy' ? -dollars : dollars),
+      positions,
+      prices: { ...trade.prices, [active.symbol]: active.price },
+      orders: [{
+        id: Date.now(),
+        side,
+        symbol: active.symbol,
+        shares: tradeShares,
+        price: active.price,
+        total: dollars,
+        time: new Date().toLocaleString(),
+      }, ...trade.orders].slice(0, 10),
+    }
+
+    setTrade(nextTrade)
     setError('')
+    await saveToMockFidelity(nextTrade)
+  }
+
+  async function resetTrade() {
+    const nextTrade = freshTradeState()
+    setTrade(nextTrade)
+    setError('')
+    await saveToMockFidelity(nextTrade)
   }
 
   return (
@@ -99,10 +110,12 @@ function PaperTrading() {
           <div>
             <p className="label">Trade</p>
             <h1>Trade women-led companies with practice cash.</h1>
-            <p>Use the cash in your mock Fidelity account to buy fractional shares without placing real orders.</p>
+            <p>This hackathon simulation uses practice cash. No real brokerage orders are placed.</p>
           </div>
-          <button className="btn-outline" type="button" onClick={() => setTrade(freshTradeState())}>Reset</button>
+          <button className="btn-outline" type="button" onClick={resetTrade}>Reset</button>
         </div>
+
+        {syncStatus && <p className="note">{syncStatus}</p>}
 
         <div className="source-note">
           {coinbase?.ok ? 'Coinbase API connected. ' : ''}

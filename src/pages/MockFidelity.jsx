@@ -1,37 +1,50 @@
-import { useState } from 'react'
-import { mockFidelity } from '../data/rootedData.js'
+import { useEffect, useState } from 'react'
+import { womenLedStocks } from '../womenLedStocks.js'
+import { getInvestments, saveInvestments } from '../../scripts/services/supabaseService.js'
+import { buildMockFidelityPortfolio, readTradeState } from '../services/tradePortfolio.js'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
 function MockFidelity() {
-  const [status, setStatus] = useState('')
-  const totalValue = mockFidelity.accounts.reduce((sum, account) => sum + account.value, 0)
-  const totalCash = mockFidelity.accounts.reduce((sum, account) => sum + account.cash, 0)
-  const positions = mockFidelity.accounts.flatMap((account) =>
-    account.positions.map(([symbol, name, type, value, allocation]) => ({
+  const trade = readTradeState()
+  const portfolio = buildMockFidelityPortfolio(trade, womenLedStocks)
+  const localRows = portfolio.accounts.flatMap((account) => [
+    ...account.positions.map(([symbol, name, type, value, allocation, quantity = 0, price = 0]) => ({
       account: account.type,
       symbol,
       name,
       type,
       value,
       allocation,
+      quantity,
+      price,
     })),
-  )
+    { account: account.type, symbol: 'CASH', name: 'Cash', type: 'cash', value: account.cash, allocation: 0 },
+  ])
+  const [savedRows, setSavedRows] = useState([])
+  const rows = savedRows.length && !trade.orders.length
+    ? savedRows.map((row) => ({
+      account: row.account_type,
+      symbol: row.symbol,
+      name: row.name,
+      type: row.asset_type,
+      value: Number(row.value),
+      allocation: Number(row.allocation_percent),
+      quantity: Number(row.quantity) || 0,
+      price: Number(row.price) || 0,
+    }))
+    : localRows
+  const positions = rows.filter((row) => row.type !== 'cash')
+  const totalCash = rows.filter((row) => row.type === 'cash').reduce((sum, row) => sum + row.value, 0)
+  const totalValue = positions.reduce((sum, position) => sum + position.value, totalCash)
+  const accountCount = new Set(rows.map((row) => row.account)).size
 
-  async function sendMockData() {
-    setStatus('sending')
-    try {
-      const response = await fetch('/api/mock-fidelity/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...mockFidelity, syncedAt: new Date().toISOString() }),
-      })
-      if (!response.ok) throw new Error('Request failed')
-      setStatus('sent')
-    } catch {
-      setStatus('failed')
-    }
-  }
+  useEffect(() => {
+    getInvestments()
+      .then((rows) => (rows.length && !trade.orders.length ? rows : saveInvestments(portfolio)))
+      .then(setSavedRows)
+      .catch(() => {})
+  }, [])
 
   return (
     <main className="mock-page">
@@ -40,21 +53,15 @@ function MockFidelity() {
           <div>
             <p className="label">Fake brokerage demo</p>
             <h1>Mock Fidelity Account</h1>
-            <p>Local demo data only. No Fidelity login or real account connection is used.</p>
+            <p>Local demo data only. Changes sync automatically when you are logged in.</p>
           </div>
-          <button className="btn-outline" type="button" onClick={sendMockData} disabled={status === 'sending'}>
-            {status === 'sending' ? 'Sending...' : 'Send Data'}
-          </button>
         </div>
 
-        {status === 'sent' && <p className="note">Mock Fidelity data sent to Rooted.</p>}
-        {status === 'failed' && <p className="note error-text">Failed to send mock Fidelity data.</p>}
-
         <div className="metric-grid">
-          <div><span>Account holder</span><strong>{mockFidelity.accountHolder}</strong></div>
+          <div><span>Account holder</span><strong>{portfolio.accountHolder}</strong></div>
           <div><span>Total value</span><strong>{usd.format(totalValue)}</strong></div>
           <div><span>Cash</span><strong>{usd.format(totalCash)}</strong></div>
-          <div><span>Accounts</span><strong>{mockFidelity.accounts.length}</strong></div>
+          <div><span>Accounts</span><strong>{accountCount}</strong></div>
         </div>
 
         <section className="panel">

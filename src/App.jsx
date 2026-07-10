@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Navigation from './components/Navigation.jsx'
 import Forum from './pages/Forum.jsx'
 import Home from './pages/Home.jsx'
@@ -21,7 +21,7 @@ function App() {
         <Route path="/salary-negotiation" element={<SalaryNegotiation />} />
         <Route path="/startups" element={<Startups />} />
         <Route path="/trade" element={<PaperTrading />} />
-        <Route path="/paper-trading" element={<PaperTrading />} />
+        <Route path="/paper-trading" element={<Navigate replace to="/trade" />} />
         <Route path="/mock-fidelity" element={<MockFidelity />} />
         <Route path="/rooted/mock-fidelity-received" element={<MockImportPreview />} />
         <Route path="*" element={<Home />} />
