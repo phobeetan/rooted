@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CardGrid from '../components/CardGrid.jsx'
 import GrowingTree from '../components/GrowingTree.jsx'
 import StatCarousel from '../components/StatCarousel.jsx'
@@ -6,6 +6,7 @@ import StartupModal from '../components/StartupModal.jsx'
 import { founders, startups, stats } from '../data/rootedData.js'
 
 function Home() {
+  const logoRef = useRef(null)
   const [tab, setTab] = useState('investors')
   const [query, setQuery] = useState('')
   const [selectedStartup, setSelectedStartup] = useState(null)
@@ -18,10 +19,27 @@ function Home() {
     item.name.toLowerCase().includes(q) || item.tag.toLowerCase().includes(q)
   ))
 
+  useEffect(() => {
+    const animateLogo = () => {
+      const progress = Math.min(window.scrollY / window.innerHeight, 1)
+      const logo = logoRef.current
+      if (!logo) return
+      logo.style.setProperty('--logo-shift', `${progress * 160}px`)
+      logo.style.setProperty('--logo-turn', `${progress * 28}deg`)
+      logo.style.setProperty('--logo-scale', 1 + progress * 0.35)
+      logo.style.setProperty('--logo-opacity', 0.82 - progress * 0.5)
+    }
+
+    animateLogo()
+    window.addEventListener('scroll', animateLogo, { passive: true })
+    return () => window.removeEventListener('scroll', animateLogo)
+  }, [])
+
   return (
     <>
       <main>
         <section className="hero">
+          <img ref={logoRef} className="hero-logo" src="/rooted-flower.png" alt="Rooted Finance flower" />
           <div className="index">Rooted Finance</div>
           <h1>Build wealth. Build freedom.</h1>
           <p>A calm place to learn, practice investing, find women-led companies, and back founders growing from the same roots.</p>
