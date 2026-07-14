@@ -11,7 +11,7 @@ const links = [
   ['/crypto', 'Crypto'],
   ['/donations', 'Donations'],
   ['/salary-negotiation', 'Salary Negotiation'],
-  ['/forum', 'Forum'],
+  ['/forum', 'Community Forum'],
 ]
 
 function Navigation() {
