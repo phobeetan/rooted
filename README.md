@@ -8,7 +8,7 @@ Rooted addresses the barrier for investing with a sequence of low-stakes practic
 The homepage frames this as a growth metaphor: a scroll-driven animated tree (roots → trunk → branches → buds) that maps onto the feature journey.
 
 ##Features
-- Paper Trading: practice trading with $10,000 in fake cash against a real-time-ish watchlist of women-led stocks.
+- Paper Trading: practice trading with $10,000 in fake cash against a real-time watchlist of women-led stocks.
 - Mock Fidelity: a Fidelity-style brokerage account view built from your paper-trading history (positions, allocation by type, cash).
 - AI Investment Assistant ("Bud"): a Gemini-powered chat assistant grounded in your profile, mock portfolio, the startup directory, and - forum sentiment.
 - Women-Led Startup Directory: a browsable, filterable directory of startups and founders to invest in.
